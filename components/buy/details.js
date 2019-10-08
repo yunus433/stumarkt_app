@@ -1,0 +1,339 @@
+import React, {Component} from 'react';
+import { AppRegistry, Text, View, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView} from 'react-native';
+import Swiper from 'react-native-swiper'
+import { API_KEY } from 'react-native-dotenv'
+
+import Header from './../partials/header';
+import NavBar from './../partials/navBar';
+
+export default class BuyDetails extends Component{
+  static navigationOptions = {
+    header: null
+  };
+
+  constructor (props) {
+    super(props);
+    this.state = {
+      user: this.props.navigation.getParam('user', undefined),
+      productId: this.props.navigation.getParam('id', undefined),
+      search: undefined,
+      product: {},
+      latestProducts: [],
+      message: ""
+    };
+  };
+
+  getProductDetails = () => {
+    if (!this.state.productId)
+      return this.props.navigation.push('main', {"user": this.state.user});
+
+    fetch(`https://www.stumarkt.com/api/products?id=${this.state.productId}`, {
+        headers: {
+          "x_auth": API_KEY
+        }
+      })
+      .then(result => result.json())
+      .then(data => {
+        if (data.error) 
+          return alert(data.error);
+  
+        this.setState({
+          "product": data.product
+        });
+
+        this.getLatestProducts(data.product);
+      })
+      .catch(err => {
+        alert("Error: " + err)
+      });
+  };
+
+  getLatestProducts = (product) => {
+    fetch(`https://www.stumarkt.com/api/products?limit=5&category=${product.category}`, {
+        headers: {
+          "x_auth": API_KEY
+        }
+      })
+      .then(result => result.json())
+      .then(data => {
+        if (data.error) 
+          return alert(data.error);
+
+        this.setState({
+          "latestProducts": data.products
+        });
+      })
+      .catch(err => {
+        alert("Error: " + err)
+      });
+  };
+
+  sendMessage = () => {
+    fetch('https://www.stumarkt.com/api/users?id=' + this.state.product.owner, {
+      headers: {
+        "x_auth": API_KEY
+      }
+    })
+      .then(response => {return response.json()})
+      .then(data => {
+        if (data.error) return alert("Err: " + data.error);
+
+        this.props.navigation.push('messageDetails', {
+          "user": this.state.user,
+          "buyer": this.state.user,
+          "owner": data.user,
+          "product": this.state.product,
+          "messageContent": this.state.message,
+          "messagesOf": "buyer"
+        });
+      })
+      .catch((err) => {
+        return alert("Err: " + err);
+      });
+  };
+
+  componentWillMount() {
+    this.getProductDetails();
+  }
+
+  render() {
+    return (
+      <View style={styles.mainWrapper}>
+        <Header navigation={this.props.navigation}></Header>
+        <View style={styles.content} >
+          <ScrollView style={styles.innerContent} ref="_innerContentScrollView">
+            <View style={styles.productWrapper} >
+              {
+                (this.state.product.productPhotoArray) ?
+                <Swiper 
+                  style={styles.imageWrapper} 
+                  showsButtons={true} 
+                  dotStyle={styles.imageWrapperDotStyle} 
+                  activeDotStyle={styles.imageWrapperActiveDotStyle}
+                  showsButtons={false} >
+                  {this.state.product.productPhotoArray.map((src, key) => {
+                    return (
+                      <View style={styles.eachImageWrapper} key={key} >
+                        <Image style={styles.eachImage} source={{uri: src}} ></Image>
+                      </View>
+                    )
+                  })}
+                </Swiper>
+                : 
+                null
+              }
+              <Text style={styles.productName} >{this.state.product.name}</Text>
+              <Text style={styles.productCreatedAt} >Added {this.state.product.createdAt}</Text>
+              <View style={styles.productLocationWrapper} >
+                <Image source={require('./../../assets/location-logo.png')} style={styles.productLocationLogo} ></Image>
+                <Text style={styles.productLocation} >{this.state.product.location}</Text>
+              </View>
+              <Text style={styles.productDescription} >{this.state.product.description}</Text>
+              <Text style={styles.productPrice} >{this.state.product.price}</Text>
+            </View>
+            <View style={styles.messagesWrapper} >
+              <Text style={styles.messagesTitle} >Nachricht schreiben</Text>
+              <TextInput style={styles.messagesInput} placeholder="Nachricht" multiline={true} onChangeText={(message) => {this.setState({message})}} ></TextInput>
+              <TouchableOpacity style={styles.messageSendButton} onPress={() => {this.sendMessage()}} >
+                <Text style={styles.messageSendButtonText} >Nachricht Senden</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.latestProductsWrapper}  >
+              <Text style={styles.latestProductsTitle} >Ähnliche Anzeigen</Text>
+              {
+                this.state.latestProducts.map((product, key) => {
+                  return (
+                    <TouchableOpacity key={key} style={styles.eachProductWrapper} onPress={() => {this.props.navigation.push('buyDetails', {"user": this.state.user, "id": product._id})}} > 
+                      <View style={styles.eachProductLeftSide} >
+                        <Image source={{uri: product.productPhotoArray[0]}} style={styles.eachProductImage} ></Image>
+                      </View>
+                      <View style={styles.eachProductRightSide} >
+                        <Text style={styles.eachProductName} numberOfLines={1} > {product.name} </Text>
+                        <Text style={styles.eachProductLocation} > {product.location} </Text>
+                        <Text style={styles.eachProductPrice} > {product.price} </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })
+              }
+            </View>
+          </ScrollView>
+        </View>
+        <NavBar navigation={this.props.navigation} pageName="main" ></NavBar>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  mainWrapper: {
+    flex: 1,
+    backgroundColor: "rgb(248, 248, 248)",
+  },
+  content: {
+    flex: 8, paddingBottom: 100
+  },
+  innerContent: {
+    padding: 20,
+    flex: 1
+  },
+  productWrapper: {
+    backgroundColor: "white",
+    flex: 1,
+    borderColor: "rgb(236, 235, 235)",
+    borderWidth: 2,
+    borderRadius: 15,
+    padding: 20,
+    paddingTop: 0
+  },
+  imageWrapper: {
+    height: 300,
+    paddingTop: 5,
+    paddingBottom: 5
+  },
+  imageWrapperDotStyle: {
+    backgroundColor: "rgb(112, 112, 112)"
+  },
+  imageWrapperActiveDotStyle: {
+    backgroundColor: "rgb(255, 67, 148)"
+  },
+  eachImageWrapper: {
+    flex: 1
+  },
+  eachImage: {
+    height: 300,
+    resizeMode: "contain"
+  },
+  productName: {
+    color: "rgb(112, 112, 112)",
+    fontSize: 22,
+    fontWeight: "700",
+    marginBottom: 5
+  },
+  productCreatedAt: {
+    color: "rgb(112, 112, 112)",
+    fontSize: 14,
+    fontWeight: "300",
+    marginBottom: 15
+  },
+  productLocationWrapper: {
+    flexDirection: "row",
+    marginBottom: 20,
+    alignItems: "center"
+  },
+  productLocationLogo: {
+    height: 15,
+    marginLeft: -5,
+    resizeMode: "contain"
+  },
+  productLocation: {
+    color: "rgb(112, 112, 112)",
+    fontSize: 16,
+    fontWeight: "300"
+  },
+  productDescription: {
+    fontSize: 18,
+    color: "rgb(112, 112, 112)",
+    fontWeight: "500",
+    marginBottom: 20
+  },
+  productPrice: {
+    color: "rgb(255, 67, 148)",
+    fontSize: 28,
+    fontWeight: "800",
+    marginLeft: "auto"
+  },
+  messagesWrapper: {
+    padding: 20, 
+    backgroundColor: "white",
+    borderColor: "rgb(236, 235, 235)",
+    borderWidth: 2,
+    marginTop: 20,
+    borderRadius: 15
+  },
+  messagesTitle: {
+    color: "rgb(112, 112, 112)",
+    fontWeight: "200",
+    fontSize: 27,
+    marginBottom: 10
+  },
+  messagesInput: {
+    color: "rgb(112, 112, 112)",
+    fontSize: 20,
+    padding: 10,
+    borderColor: "rgb(236, 235, 235)",
+    borderWidth: 2,
+    fontWeight: "300",
+    borderRadius: 15,
+    height: 150,
+    marginBottom: 20,
+    backgroundColor: "rgb(248, 248, 248)"
+  },
+  messageSendButton: {
+    marginLeft: "auto",
+    padding: 10,
+    borderColor: "rgba(255, 61, 148, 0.34)",
+    backgroundColor: "rgba(255, 108, 128, 0.3)",
+    borderWidth: 2,
+    borderRadius: 10
+  },
+  messageSendButtonText: {
+    color: "rgb(255, 61, 148)",
+    fontSize: 18,
+    fontWeight: "800"
+  },
+  latestProductsWrapper: {
+    marginTop: 20,
+    marginBottom: 60
+  },
+  latestProductsTitle: {
+    color: "rgb(112, 112, 112)",
+    fontWeight: "200",
+    fontSize: 27,
+    marginBottom: 10
+  },
+  eachProductWrapper: {
+    padding: 5,
+    backgroundColor: "white",
+    marginBottom: 10,
+    flexDirection: "row",
+    borderRadius: 5,
+    borderColor: "rgb(236, 235, 235)",
+    borderWidth: 2
+  },
+  eachProductLeftSide: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10
+  },
+  eachProductImage: {
+    height: 100,
+    width: 100,
+    borderRadius: 5
+  },
+  eachProductRightSide: {
+    paddingTop: 10,
+    paddingBottom: 10,
+    flex: 1
+  },
+  eachProductName: {
+    fontSize: 18,
+    color: "rgb(112, 112, 112)",
+    fontWeight: "800"
+  },
+  eachProductLocation: {
+    fontSize: 14,
+    color: "rgb(112, 112, 112)",
+    fontWeight: "300",
+    marginTop: 3
+  },
+  eachProductPrice: {
+    alignSelf: "flex-end",
+    marginTop: "auto",
+    fontSize: 25,
+    color: "rgb(255, 67, 148)",
+    fontWeight: "700"
+  }
+})
+
+AppRegistry.registerComponent('BuyDetails', () => BuyDetails);
