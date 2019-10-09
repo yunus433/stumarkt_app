@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { AsyncStorage, AppRegistry, Text, View, StyleSheet, TextInput, Image, TouchableOpacity} from 'react-native';
+import { AsyncStorage, AppRegistry, Text, View, StyleSheet, TextInput, Image, TouchableOpacity, Keyboard} from 'react-native';
 import { API_KEY } from 'react-native-dotenv'
 
 export default class Login extends Component{
@@ -28,6 +28,7 @@ export default class Login extends Component{
   };
 
   onLoginPageSend() {
+    Keyboard.dismiss();
     if (this.state.email != '' && this.state.password != '' ) {
       fetch("https://www.stumarkt.com/api/login?email=" + this.state.email + "&password=" + this.state.password, {
         headers: {

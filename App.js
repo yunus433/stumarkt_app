@@ -13,6 +13,7 @@ import New from './components/sell/new';
 import SellDashboard from './components/sell/dashboard';
 import SellDetails from './components/sell/details';
 import Favorites from './components/favorite/index';
+import Edit from './components/edit/index';
 
 const MainNavigator = createStackNavigator({
   loading: {screen: Loading},
@@ -27,7 +28,8 @@ const MainNavigator = createStackNavigator({
   messageDetails: {screen: MessageDetails},
   sellDashboard: {screen: SellDashboard},
   sellDetails: {screen: SellDetails},
-  favorites: {screen: Favorites}
+  favorites: {screen: Favorites},
+  edit: {screen: Edit}
 }, {
   transitionConfig : () => ({
   	transitionSpec: {
