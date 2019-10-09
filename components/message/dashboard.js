@@ -50,7 +50,7 @@ export default class MessageDetails extends Component{
         return alert(data.error);
 
       this.setState({
-        "ownerMessages": data.messages
+        "ownerMessages": data.messages[0]
       });
     })
     .catch(err => {

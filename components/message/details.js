@@ -37,7 +37,7 @@ export default class MessageDetails extends Component{
   };
 
   componentWillMount () {
-    fetch('https://www.stumarkt.com/api/messages?buyerId=' + this.state.buyer._id + '&productId=' + this.state.product._id, {
+    fetch('https://www.stumarkt.com/api/messages?buyer=' + this.state.buyer._id + '&product=' + this.state.product._id + '&sendedBy=' + (this.state.messagesOf == 'buyer' ? 'owner' : 'buyer'), {
       headers: {
         "x_auth": API_KEY
       }
@@ -52,7 +52,7 @@ export default class MessageDetails extends Component{
       })
       .catch((err) => {
         return alert("Err: " + err);
-      })
+      });
 
     this.keyboardWillShowSub = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
     this.keyboardWillHideSub = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);

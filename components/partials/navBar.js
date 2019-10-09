@@ -43,7 +43,7 @@ export default class NavBar extends Component{
             <Image source={require('./../../assets/favorites-page-nav-icon.png')} style={styles.navButtonImage} ></Image>
           }
         </TouchableOpacity>
-        <TouchableOpacity style={styles.userPageNavButton} onPress={() => {this.navigateController('edit')}} >
+        <TouchableOpacity style={styles.userPageNavButton} onPress={() => {this.navigateController('editDashboard')}} >
           { this.props.pageName == "user" ? 
             <Image source={require('./../../assets/user-page-nav-icon-selected.png')} style={styles.navButtonImage} ></Image>
             :

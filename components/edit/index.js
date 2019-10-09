@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {AsyncStorage, AppRegistry, Text, View, StyleSheet, ScrollView, TouchableOpacity, Image} from 'react-native';
-import { API_KEY } from 'react-native-dotenv'
 
 import Header from './../partials/header';
 import NavBar from './../partials/navBar';
@@ -35,7 +34,7 @@ export default class Index extends Component{
         <View style={styles.content} >
           <ScrollView style={{width: "100%", flex: 1}} >
             <View style={styles.userWrapper} >
-              <TouchableOpacity style={styles.editIconWrapper} >
+              <TouchableOpacity style={styles.editIconWrapper} onPress={() => {this.props.navigation.push('editUser', {user: this.state.user})}} >
                 <Image source={require('./../../assets/edit-icon.png')} style={styles.editIcon} ></Image>
               </TouchableOpacity>
               <Image source={{uri: this.state.user.profilePhoto}} style={styles.profilePhoto}></Image>
@@ -43,7 +42,7 @@ export default class Index extends Component{
               <Text style={styles.userUni} >{this.state.user.university}</Text>
             </View>
             <TouchableOpacity style={styles.productsButton} onPress={() => {this.props.navigation.navigate('sellDashboard', {'user': this.state.user})}}>
-              <Text style={styles.productsButtonText} >Meine Anzeigen</Text>
+              <Text style={styles.productsButtonText} >Mein Anzeigen</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.logoutButton} onPress={() => {this.logoutButtonController()}}>
               <Text style={styles.logoutButtonText} >Ausloggen</Text>
@@ -66,7 +65,7 @@ const styles = StyleSheet.create({
     justifyContent: "center", alignItems: "center"
   },
   userWrapper: {
-    width: "100%", marginTop: 20
+    width: "100%", marginTop: 20, flex: 1
   },
   editIconWrapper: {
     justifyContent: "center", alignItems: "center",
@@ -87,12 +86,12 @@ const styles = StyleSheet.create({
     color: "rgb(82, 82, 82)", fontSize: 28, fontWeight: "700"
   },
   userUni: {
-    alignSelf: "center", marginTop: 10,
+    alignSelf: "center", marginTop: 10, textAlign: "center",
     color: "rgb(82, 82, 82)", fontSize: 18, fontWeight: "300"
   },
   productsButton: {
     backgroundColor: "rgb(255, 94, 135)", padding: 15, borderRadius: 25,
-    justifyContent: "center", alignItems: "center", marginTop: 100, alignSelf: "center"
+    justifyContent: "center", alignItems: "center", marginTop: 200, alignSelf: "center"
   },
   productsButtonText: {
     color: "white", fontWeight: "700", fontSize: 20
@@ -101,7 +100,7 @@ const styles = StyleSheet.create({
     alignSelf: "center", marginTop: 10
   },
   logoutButtonText: {
-    color: "rgb(255, 94, 135)", fontSize: 18, fontWeight: "300"
+    color: "rgb(255, 94, 135)", fontSize: 18, fontWeight: "300", textDecorationLine: "underline"
   }
 });
 
