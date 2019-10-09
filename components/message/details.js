@@ -158,7 +158,7 @@ export default class MessageDetails extends Component{
         <Header navigation={this.props.navigation}></Header>
         <View style={styles.content} >
           <View style={styles.contentHeader} >
-            <TouchableOpacity onPress={() => {this.props.navigation.goBack(null)}} >
+            <TouchableOpacity onPress={() => {this.props.navigation.push("messageDashboard", {"user": this.state.user});}} >
               <Image source={require('./../../assets/back-button.png')} style={styles.navButtonImage} ></Image>
             </TouchableOpacity>
           </View>
