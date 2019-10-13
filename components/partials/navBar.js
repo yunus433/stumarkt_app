@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {AppRegistry, Text, View, StyleSheet, Image, TouchableOpacity, ScrollView} from 'react-native';
-import { white } from 'ansi-colors';
+import { API_KEY } from 'react-native-dotenv'
 
 export default class NavBar extends Component{
   constructor (props) {
@@ -11,8 +11,23 @@ export default class NavBar extends Component{
   };
 
   navigateController = (page) => {
-    this.props.navigation.push(page, {"user": this.state.user});
+    fetch("https://www.stumarkt.com/api/users?id=" + this.state.user._id, {
+        headers: {
+          "x_auth": API_KEY
+        }
+      })
+      .then(response => {return response.json()})
+      .then(data => {
+        if (data.error)
+          this.props.navigation.push('login');
+
+          this.props.navigation.push(page, {"user": data.user});
+      })
+      .catch(err => {
+        this.props.navigation.push('login');
+      });
   }
+
 
   render() {
     return (
@@ -25,6 +40,18 @@ export default class NavBar extends Component{
           }
         </TouchableOpacity>
         <TouchableOpacity style={styles.messagesPageNavButton} onPress={() => {this.navigateController('messageDashboard')}} >
+          { this.state.user.notReadMessage ?
+            this.props.pageName == "message" ?
+              <View style={styles.notReadMessageSelected} >
+                <Text style={styles.notReadMessageText} >{this.state.user.notReadMessage}</Text>
+              </View>
+              :
+              <View style={styles.notReadMessage} >
+                <Text style={styles.notReadMessageText} >{this.state.user.notReadMessage}</Text>
+              </View>
+            :
+            <View></View>
+          }
           { this.props.pageName == "message" ? 
             <Image source={require('./../../assets/messages-page-nav-icon-selected.png')} style={styles.navButtonImage} ></Image>
             :
@@ -66,28 +93,28 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center", alignItems: "center",
     backgroundColor: "white",
-    padding: 5,
+    height: 50,
     borderColor: "rgb(112, 112, 112)", borderWidth: 1, borderTopLeftRadius: 20, borderBottomLeftRadius: 20
   },
   messagesPageNavButton: {
     flex: 1,
     justifyContent: "center", alignItems: "center",
     backgroundColor: "white",
-    padding: 5,
+    height: 50,
     borderTopColor: "rgb(112, 112, 112)", borderTopWidth: 1, borderBottomColor: "rgb(112, 112, 112)", borderBottomWidth: 1
   },
   favoritesPageNavButton: {
     flex: 1,
     justifyContent: "center", alignItems: "center",
     backgroundColor: "white",
-    padding: 5,
+    height: 50,
     borderTopColor: "rgb(112, 112, 112)", borderTopWidth: 1, borderBottomColor: "rgb(112, 112, 112)", borderBottomWidth: 1
   },
   userPageNavButton: {
     flex: 1,
     justifyContent: "center", alignItems: "center",
     backgroundColor: "white",
-    padding: 5,
+    height: 50,
     borderColor: "rgb(112, 112, 112)", borderWidth: 1, borderTopRightRadius: 20, borderBottomRightRadius: 20
   },
   newProductNavButtonWrapper: {
@@ -99,9 +126,26 @@ const styles = StyleSheet.create({
     borderColor: "rgb(112, 112, 112)", borderWidth: 1, borderRadius: 23
   },
   navButtonImage: {
-    height: 35, width: 35,
+    height: 30, width: 30,
     resizeMode: "contain",
   },
+  notReadMessage: {
+    height: 25, width: 25,
+    backgroundColor: "rgb(255, 94, 135)", zIndex: 2,
+    marginLeft: "auto", marginRight: 5 ,marginBottom: -15,
+    justifyContent: "center", alignItems: "center",
+    borderColor: "rgb(112, 112, 112)", borderWidth: 2, borderRadius: 12.5
+  },
+  notReadMessageSelected: {
+    height: 25, width: 25,
+    backgroundColor: "rgb(255, 176, 101)", zIndex: 2,
+    marginLeft: "auto", marginRight: 5 ,marginBottom: -15,
+    justifyContent: "center", alignItems: "center",
+    borderColor: "rgb(112, 112, 112)", borderWidth: 2, borderRadius: 12.5
+  },
+  notReadMessageText: {
+    color: "white", fontSize: 12, fontWeight: "600"
+  }
 });
 
 AppRegistry.registerComponent('NavBar', () => NavBar);

@@ -37,7 +37,7 @@ export default class MessageDetails extends Component{
   };
 
   componentWillMount () {
-    fetch('https://www.stumarkt.com/api/messages?buyer=' + this.state.buyer._id + '&product=' + this.state.product._id + '&sendedBy=' + (this.state.messagesOf == 'buyer' ? 'owner' : 'buyer'), {
+    fetch('https://www.stumarkt.com/api/messages?buyer=' + this.state.buyer._id + '&product=' + this.state.product._id + '&sendedBy=' + (this.state.messagesOf == 'buyer' ? 'owner' : 'buyer') + '&user=' + this.state.user._id, {
       headers: {
         "x_auth": API_KEY
       }
@@ -48,7 +48,7 @@ export default class MessageDetails extends Component{
 
         this.setState({
           "messages": data.messages
-        })
+        });
       })
       .catch((err) => {
         return alert("Err: " + err);

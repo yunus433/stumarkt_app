@@ -50,7 +50,7 @@ export default class MessageDetails extends Component{
         return alert(data.error);
 
       this.setState({
-        "ownerMessages": data.messages[0]
+        "ownerMessages": data.messages
       });
     })
     .catch(err => {
@@ -112,7 +112,7 @@ export default class MessageDetails extends Component{
             .then(userData => {
               if (userData.error) return alert("Err: " + userData.error);
 
-              this.props.navigation.navigate('messageDetails', {
+              this.props.navigation.push('messageDetails', {
                 "user": this.state.user,
                 "buyer": userData.user,
                 "owner": this.state.user,
@@ -178,24 +178,31 @@ export default class MessageDetails extends Component{
                   </View>
                 :
                 this.state.ownerMessages.length ?
-                this.state.ownerMessages.map((messageArray, key) => {
+                this.state.ownerMessages.map((messageProductsArray, key) => {
                   return (
-                    <TouchableOpacity key={key} style={styles.eachMessageWrapper} onPress={() => {this.messageDetailsButtonController("owner", messageArray[0].buyerId, messageArray[0].productId)}} >
-                      <Image style={styles.eachMessageProductImage} source={{uri: messageArray[messageArray.length-1].productProfile}} ></Image>
-                      <View style={styles.eachMessageContentWrapper} >
-                        <Text style={styles.eachMessageProductName} >{messageArray[messageArray.length-1].productName}</Text>
-                        <View style={{flexDirection: "row"}} >
-                          <Text style={styles.eachMessageUserName} >{messageArray[messageArray.length-1].buyerName} - </Text>
-                          <Text style={styles.eachMessageTotalNumber} >{messageArray.length} message{messageArray.length > 1 ? 's' : ''}</Text>
-                        </View>
-                      </View>
-                      { messageArray.filter(message => {return !message.read && message.sendedBy == 'buyer'}).length ? 
-                        <View style={styles.notReadMessageNumberWrapper} >
-                          <Text style={styles.notReadMessageNumber} >{messageArray.filter(message => {return !message.read && message.sendedBy == 'buyer'}).length}</Text>
-                        </View> 
-                        :
-                        null }
-                    </TouchableOpacity>
+                    <View key={key}> 
+                      { messageProductsArray.map((messageArray, key) => {
+                          return (
+                            <TouchableOpacity key={key} style={styles.eachMessageWrapper} onPress={() => {this.messageDetailsButtonController("owner", messageArray[0].buyerId, messageArray[0].productId)}} >
+                              <Image style={styles.eachMessageProductImage} source={{uri: messageArray[messageArray.length-1].productProfile}} ></Image>
+                              <View style={styles.eachMessageContentWrapper} >
+                                <Text style={styles.eachMessageProductName} >{messageArray[messageArray.length-1].productName}</Text>
+                                <View style={{flexDirection: "row"}} >
+                                  <Text style={styles.eachMessageUserName} >{messageArray[messageArray.length-1].buyerName} - </Text>
+                                  <Text style={styles.eachMessageTotalNumber} >{messageArray.length} message{messageArray.length > 1 ? 's' : ''}</Text>
+                                </View>
+                              </View>
+                              { messageArray.filter(message => {return !message.read && message.sendedBy == 'buyer'}).length ? 
+                                <View style={styles.notReadMessageNumberWrapper} >
+                                  <Text style={styles.notReadMessageNumber} >{messageArray.filter(message => {return !message.read && message.sendedBy == 'buyer'}).length}</Text>
+                                </View> 
+                                :
+                                null }
+                            </TouchableOpacity>
+                          );
+                        })
+                      }
+                    </View>
                   )})
                   :
                   <View style={styles.noMessageWrapper} >
