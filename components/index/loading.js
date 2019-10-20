@@ -23,7 +23,7 @@ export default class Loading extends Component{
             if (data.error || !data.user)
               return this.props.navigation.push('login'); 
 
-            this.props.navigation.push('editUser', {"user": data.user});
+            this.props.navigation.push('main', {"user": data.user});
           })
           .catch(err => {
             this.props.navigation.push('login');

@@ -95,6 +95,31 @@ export default class BuyDetails extends Component{
   componentWillMount() {
     this.getProductDetails();
   }
+  
+  addToFavorites = (id) => {
+    fetch(`https://www.stumarkt.com/api/addToFavorite?id=${this.state.user._id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x_auth": API_KEY
+      },
+      body: JSON.stringify({
+        "productId": id,
+      })
+    })
+      .then(response => {return response.json()})
+      .then(data => {
+        if (data.error) return alert("Err: " + data.error);
+        if (!data.user) return alert("Err: An unknown erro occured, please try again.");
+
+        this.setState({
+          "user": data.user
+        });
+      })
+      .catch(err => {
+        alert("Err: " + err);
+      });
+  }
 
   render() {
     return (
@@ -129,7 +154,16 @@ export default class BuyDetails extends Component{
                 <Text style={styles.productLocation} >{this.state.product.location}</Text>
               </View>
               <Text style={styles.productDescription} >{this.state.product.description}</Text>
-              <Text style={styles.productPrice} >{this.state.product.price}</Text>
+              <View style={styles.addToFavoriteWrapper} >
+                <TouchableOpacity onPress={() => {this.addToFavorites(this.state.product._id)}} style={{marginRight: 5}} >
+                  { this.state.user.favorites.includes(this.state.product._id) ? 
+                    <Image source={require('./../../assets/favorites-page-nav-icon-selected.png')} style={styles.addToFavoriteButton} ></Image>
+                    :
+                    <Image source={require('./../../assets/favorites-page-nav-icon.png')} style={styles.addToFavoriteButton} ></Image>
+                  }
+                </TouchableOpacity>
+                <Text style={styles.eachProductPrice} > {this.state.product.price} </Text>
+              </View>
             </View>
             <View style={styles.messagesWrapper} >
               <Text style={styles.messagesTitle} >Nachricht schreiben</Text>
@@ -236,6 +270,13 @@ const styles = StyleSheet.create({
     color: "rgb(112, 112, 112)",
     fontWeight: "500",
     marginBottom: 20
+  },
+  addToFavoriteWrapper: {
+    flexDirection: "row", justifyContent: "flex-end", alignItems: "center", 
+    width: "100%", marginTop: "auto"
+  },
+  addToFavoriteButton: {
+    height: 25, width: 25, resizeMode: "contain"
   },
   productPrice: {
     color: "rgb(255, 67, 148)",

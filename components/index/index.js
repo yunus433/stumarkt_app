@@ -123,6 +123,31 @@ export default class Index extends Component{
     this.getLatestProducts(this.state.page);
   }
 
+  addToFavorites = (id) => {
+    fetch(`https://www.stumarkt.com/api/addToFavorite?id=${this.state.user._id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x_auth": API_KEY
+      },
+      body: JSON.stringify({
+        "productId": id,
+      })
+    })
+      .then(response => {return response.json()})
+      .then(data => {
+        if (data.error) return alert("Err: " + data.error);
+        if (!data.user) return alert("Err: An unknown erro occured, please try again.");
+
+        this.setState({
+          "user": data.user
+        });
+      })
+      .catch(err => {
+        alert("Err: " + err);
+      });
+  }
+
   render() {
     return (
       <View style={styles.mainWrapper}>
@@ -140,7 +165,16 @@ export default class Index extends Component{
                     <View style={styles.eachProductRightSide} >
                       <Text style={styles.eachProductName} numberOfLines={1} > {product.name} </Text>
                       <Text style={styles.eachProductLocation} > {product.location} </Text>
-                      <Text style={styles.eachProductPrice} > {product.price} </Text>
+                      <View style={styles.addToFavoriteWrapper} >
+                        <TouchableOpacity onPress={() => {this.addToFavorites(product._id)}} style={{marginRight: 5}} >
+                          { this.state.user.favorites.includes(product._id) ? 
+                            <Image source={require('./../../assets/favorites-page-nav-icon-selected.png')} style={styles.addToFavoriteButton} ></Image>
+                            :
+                            <Image source={require('./../../assets/favorites-page-nav-icon.png')} style={styles.addToFavoriteButton} ></Image>
+                          }
+                        </TouchableOpacity>
+                        <Text style={styles.eachProductPrice} > {product.price} </Text>
+                      </View>
                     </View>
                   </TouchableOpacity>
                 );
@@ -153,9 +187,7 @@ export default class Index extends Component{
                 <Text style={styles.backButton} > {'<'} Vorherig </Text>
               </TouchableOpacity>
               <Text style={styles.pageNumber} > {this.state.page + 1} / {Math.floor(this.state.totalProductNumber / this.state.productNumberPerPage) + 2} </Text>
-              <TouchableOpacity onPress={()=>{
-                  this.changePageController(1);
-              }} >
+              <TouchableOpacity onPress={()=>{ this.changePageController(1) }} >
                 <Text style={styles.nextButton} > Nächste {'>'} </Text>
               </TouchableOpacity>              
             </View>
@@ -227,11 +259,17 @@ const styles = StyleSheet.create({
     fontSize: 18, color: "rgb(112, 112, 112)", fontWeight: "800"
   },
   eachProductLocation: {
-    fontSize: 14, color: "rgb(112, 112, 112)", fontWeight: "300",
+    fontSize: 15, color: "rgb(255, 176, 101)", fontWeight: "500",
     marginTop: 3
   },
+  addToFavoriteWrapper: {
+    flexDirection: "row", justifyContent: "flex-end", alignItems: "center", 
+    width: "100%", marginTop: "auto"
+  },
+  addToFavoriteButton: {
+    height: 25, width: 25, resizeMode: "contain"
+  },
   eachProductPrice: {
-    alignSelf: "flex-end", marginTop: "auto",
     fontSize: 25, color: "rgb(255, 67, 148)", fontWeight: "700"
   }
 });
