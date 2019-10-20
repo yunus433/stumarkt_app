@@ -145,7 +145,7 @@ export default class SellDetails extends Component{
         <View style={styles.content} >
           <ScrollView style={styles.innnerContent} >
             { this.state.product.price != "SOLD" ?
-              <View style={styles.mainWrapper} >
+              <View style={styles.mainInnerWrapper} >
                 <Text style={styles.contentTitle} >Anzeige Einstellungen</Text>
                 <View style={styles.productOptionsWrapper} >
                   <TouchableOpacity style={styles.productOptionButton} onPress={() => {this.deleteProductButtonController()}} >
@@ -207,7 +207,7 @@ export default class SellDetails extends Component{
                 </TouchableOpacity>
               </View>
               :
-              <View style={styles.mainWrapper} >
+              <View style={styles.mainInnerWrapper} >
                 <Text style={styles.markAsSoldText} >Du hast deine Anzeigen als “verkauft” markiert.</Text>
                 <TouchableOpacity style={styles.productOptionButton} onPress={() => {this.deleteProductButtonController()}} >
                   <Text style={styles.productOptionText} >Lösch die Anzeige</Text>
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 8, 
-    padding: 20, paddingBottom: 100
+    paddingLeft: 20, paddingRight: 20, paddingBottom: 100
   },
   innnerContent: {
     flex: 1
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     color: "rgb(112, 112, 112)", fontSize: 20, fontWeight: "300", textAlign: "center",
     marginBottom: 20
   },
-  mainWrapper: {
+  mainInnerWrapper: {
     flex: 1,
     backgroundColor: "white",
     borderRadius: 15, borderColor: "rgb(236, 235, 235)", borderWidth: 2,

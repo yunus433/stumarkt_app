@@ -8,9 +8,6 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "@ant-design/react-native": "^3.1.14",
-    "antd": "^3.22.0",
-    "antd-mobile": "^2.3.1",
     "expo": "^34.0.1",
     "expo-image-manipulator": "~6.0.0",
     "expo-image-picker": "~6.0.0",
@@ -20,7 +17,6 @@
     "react-dom": "^16.8.6",
     "react-native": "https://github.com/expo/react-native/archive/sdk-34.0.0.tar.gz",
     "react-native-gesture-handler": "^1.3.0",
-    "react-native-image-crop-picker": "^0.25.0",
     "react-native-swiper": "^1.5.14",
     "react-native-web": "^0.11.4",
     "react-navigation": "^3.11.1",

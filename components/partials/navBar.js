@@ -40,7 +40,7 @@ export default class NavBar extends Component{
           }
         </TouchableOpacity>
         <TouchableOpacity style={styles.messagesPageNavButton} onPress={() => {this.navigateController('messageDashboard')}} >
-          { this.state.user.notReadMessage ?
+          { this.state.user.notReadMessage > 0 ?
             this.props.pageName == "message" ?
               <View style={styles.notReadMessageSelected} >
                 <Text style={styles.notReadMessageText} >{this.state.user.notReadMessage}</Text>
