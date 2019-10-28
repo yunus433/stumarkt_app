@@ -63,16 +63,16 @@ export default class MessageDetails extends Component{
     this.keyboardWillHideSub.remove();
   }
 
-  keyboardDidShow = (event) => {
+  keyboardWillShow = (event) => {
     this.setState({"clicked": true});
 
     Animated.parallel([
       Animated.timing(this.keyboardHeight, {
-        duration: 0,
+        duration: event.duration,
         toValue: event.endCoordinates.height,
       }),
       Animated.timing(this.messagesWrapperMarginBottom, {
-        duration: 0,
+        duration: event.duration,
         toValue: event.endCoordinates.height + this.state.messageInputWrapperHeight,
       })
     ]).start(() => {
@@ -80,14 +80,14 @@ export default class MessageDetails extends Component{
     });
   };
 
-  keyboardDidHide = (event) => {
+  keyboardWillHide = (event) => {
     Animated.parallel([
       Animated.timing(this.keyboardHeight, {
-        duration: 0,
+        duration: event.duration,
         toValue: 20,
       }),
       Animated.timing(this.messagesWrapperMarginBottom, {
-        duration: 0,
+        duration: event.duration,
         toValue: this.state.messageInputWrapperHeight
       })
     ]).start();

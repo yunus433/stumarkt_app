@@ -311,11 +311,11 @@ export default class Index extends Component{
 
 const styles = StyleSheet.create({
   mainWrapper: {
-    flex: 1,
-    backgroundColor: "rgb(248, 248, 248)",
+    flex: 1
   },
   content: {
-    flex: 8, paddingBottom: 100, paddingLeft: 20, paddingRight: 20,
+    flex: 8, paddingLeft: 20, paddingRight: 20,
+    backgroundColor: "rgb(248, 248, 248)",
     justifyContent: "center", alignItems: "center"
   },
   formWrapper: {
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     alignSelf: "center", alignItems: "center"
   },
   userImage: {
-    width: 200, height: 200, borderRadius: 100,
+    width: 200, height: 200,
     resizeMode: "contain",
   },
   userText: {

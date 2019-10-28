@@ -42,7 +42,7 @@ export default class Index extends Component{
               <Text style={styles.userUni} >{this.state.user.university}</Text>
             </View>
             <TouchableOpacity style={styles.productsButton} onPress={() => {this.props.navigation.navigate('sellDashboard', {'user': this.state.user})}}>
-              <Text style={styles.productsButtonText} >Mein Anzeigen</Text>
+              <Text style={styles.productsButtonText} >Meine Anzeigen</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.logoutButton} onPress={() => {this.logoutButtonController()}}>
               <Text style={styles.logoutButtonText} >Ausloggen</Text>
@@ -57,11 +57,11 @@ export default class Index extends Component{
 
 const styles = StyleSheet.create({
   mainWrapper: {
-    flex: 1,
-    backgroundColor: "rgb(248, 248, 248)",
+    flex: 1
   },
   content: {
-    flex: 8, paddingBottom: 100, paddingLeft: 20, paddingRight: 20,
+    flex: 8, paddingLeft: 20, paddingRight: 20,
+    backgroundColor: "rgb(248, 248, 248)",
     justifyContent: "center", alignItems: "center"
   },
   userWrapper: {
@@ -78,8 +78,7 @@ const styles = StyleSheet.create({
   },
   profilePhoto: {
     width: 200, height: 200,
-    resizeMode: "contain", alignSelf: "center",
-    borderRadius: 100
+    resizeMode: "contain", alignSelf: "center"
   },
   userName: {
     alignSelf: "center", marginTop: 15,
@@ -91,13 +90,13 @@ const styles = StyleSheet.create({
   },
   productsButton: {
     backgroundColor: "rgb(255, 94, 135)", padding: 15, borderRadius: 25,
-    justifyContent: "center", alignItems: "center", marginTop: 200, alignSelf: "center"
+    justifyContent: "center", alignItems: "center", marginTop: 100, alignSelf: "center"
   },
   productsButtonText: {
     color: "white", fontWeight: "700", fontSize: 20
   },
   logoutButton: {
-    alignSelf: "center", marginTop: 10
+    alignSelf: "center", marginTop: 10, marginBottom: 50
   },
   logoutButtonText: {
     color: "rgb(255, 94, 135)", fontSize: 18, fontWeight: "300", textDecorationLine: "underline"

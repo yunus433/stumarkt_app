@@ -77,7 +77,7 @@ export default class Index extends Component{
         <Header navigation={this.props.navigation} ></Header>
         <View style={styles.content} >
           <ScrollView style={styles.innerContent} ref="_innerContentScrollView" >
-            <Text style={styles.contentTitle} >Favorites</Text>
+            <Text style={styles.contentTitle} >Favoriten</Text>
             {
               this.state.products.length ?
               this.state.products.map((product, key) => {
@@ -106,6 +106,7 @@ export default class Index extends Component{
               :
               <Text style={styles.contentInfo} >Es gibt keine Favorites.</Text>
             }
+            <View style={{height: 60}} ></View>
           </ScrollView>
         </View>
         <NavBar navigation={this.props.navigation} pageName="favorite" ></NavBar>
@@ -116,8 +117,7 @@ export default class Index extends Component{
 
 const styles = StyleSheet.create({
   mainWrapper: {
-    flex: 1,
-    backgroundColor: "rgb(248, 248, 248)",
+    flex: 1
   },
   contentTitle: {
     color: "rgb(112, 112, 112)", fontWeight: "300", fontSize: 28,
@@ -128,10 +128,11 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   content: {
-    flex: 8, paddingBottom: 100
+    flex: 8,
+    backgroundColor: "rgb(248, 248, 248)",
   },
   innerContent: {
-    padding: 20
+    padding: 25
   },
   eachProductWrapper: {
     flexDirection: "row",

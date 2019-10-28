@@ -1,8 +1,5 @@
 import React, {Component} from 'react';
-import {AppRegistry, Text, View, StyleSheet, Image, TouchableOpacity, ScrollView} from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import * as Permissions from 'expo-permissions';
-import * as ImageManipulator from 'expo-image-manipulator';
+import {AppRegistry, Text, View, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import { API_KEY } from 'react-native-dotenv'
 
 export default class NavBar extends Component{
@@ -30,110 +27,6 @@ export default class NavBar extends Component{
         this.props.navigation.push('login');
       });
   }
-
-  newProductButtonController = async () => {
-    const permission = await Permissions.getAsync(Permissions.CAMERA);
-    if (permission.status !== 'granted') {
-        const newPermission = await Permissions.askAsync(Permissions.CAMERA);
-        if (newPermission.status === 'granted') {
-          ImagePicker.launchCameraAsync({
-            mediaTypes: "Images",
-            allowsEditing: "true"
-          })
-          .then(res => {
-            if (res.cancelled) return;
-    
-            ImageManipulator.manipulateAsync(
-              res.uri, 
-              [],
-              { compress: 0.4 }
-            )
-            .then(manipulatedRes => {
-              const formData = new FormData();
-              formData.append('photo', {
-                "uri": manipulatedRes.uri,
-                "name": `photo.${manipulatedRes.uri.split('.').pop()}`,
-                "type": `image/${manipulatedRes.uri.split('.').pop()}`
-              });
-      
-              fetch("https://www.stumarkt.com/api/newProductImage", {
-                method: "POST",
-                body: formData,
-                headers: {
-                  Accept: 'application/json',
-                  'x_auth': API_KEY,
-                  'Content-Type': 'multipart/form-data'
-                }
-              })
-              .then(response => {return response.json()})
-              .then(data => {
-                if (data && data.error)
-                  return alert("Err: " + data.error);
-      
-                if (!data || !data.fileName)
-                  return alert("Err: Unknown error occured, please try again");
-                  
-                this.props.navigation.push('new', {"user": this.state.user, "productPhotoArray": [data.fileName], "productPhotoNameArray": [manipulatedRes.uri]})
-              })
-              .catch(err => {
-                return alert("Err: " + err);
-              });
-            });
-          })
-          .catch(err => {
-            return alert("Err: " + err);
-          });
-        }
-    } else {
-      ImagePicker.launchCameraAsync({
-        mediaTypes: "Images",
-        allowsEditing: "true"
-      })
-      .then(res => {
-        if (res.cancelled) return;
-
-        ImageManipulator.manipulateAsync(
-          res.uri, 
-          [],
-          { compress: 0.4 }
-        )
-        .then(manipulatedRes => {
-          const formData = new FormData();
-          formData.append('photo', {
-            "uri": manipulatedRes.uri,
-            "name": `photo.${manipulatedRes.uri.split('.').pop()}`,
-            "type": `image/${manipulatedRes.uri.split('.').pop()}`
-          });
-  
-          fetch("https://www.stumarkt.com/api/newProductImage", {
-            method: "POST",
-            body: formData,
-            headers: {
-              Accept: 'application/json',
-              'x_auth': API_KEY,
-              'Content-Type': 'multipart/form-data'
-            }
-          })
-          .then(response => {return response.json()})
-          .then(data => {
-            if (data && data.error)
-              return alert("Err: " + data.error);
-  
-            if (!data || !data.fileName)
-              return alert("Err: Unknown error occured, please try again");
-              
-            this.props.navigation.push('new', {"user": this.state.user, "productPhotoArray": [data.fileName], "productPhotoNameArray": [manipulatedRes.uri]})
-          })
-          .catch(err => {
-            return alert("Err: " + err);
-          });
-        });
-      })
-      .catch(err => {
-        return alert("Err: " + err);
-      });
-    }
-  };
 
   render() {
     return (
@@ -165,7 +58,7 @@ export default class NavBar extends Component{
           }
         </TouchableOpacity>
         <View style={styles.newProductNavButtonWrapper}>
-          <TouchableOpacity style={styles.newProductNavButton} onPress={() => {this.newProductButtonController()}} >
+          <TouchableOpacity style={styles.newProductNavButton} onPress={() => {this.navigateController('new')}} >
             <Image source={require('./../../assets/new-page-nav-icon.png')} style={styles.navButtonImage} ></Image>
           </TouchableOpacity>
         </View>
@@ -191,7 +84,7 @@ export default class NavBar extends Component{
 const styles = StyleSheet.create({
   navigationBar: {
     backgroundColor: "white",
-    position: "absolute", width: "100%", zIndex: 2,
+    flex: 1, width: "100%", zIndex: 2,
     flexDirection: "row", justifyContent: "center", alignItems: "center",
     bottom: 20, paddingLeft: 20, paddingRight: 20, paddingTop: 10
   },

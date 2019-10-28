@@ -1,4 +1,5 @@
 import {createStackNavigator, createAppContainer} from 'react-navigation';
+import {Platform} from 'react-native';
 
 import Loading from './components/index/loading';
 import Index from './components/index/index';
@@ -8,13 +9,13 @@ import Register from './components/auth/register';
 import Verify from './components/auth/verify';
 import BuyDetails from './components/buy/details';
 import MessageDashboard from './components/message/dashboard';
-import MessageDetails from './components/message/details';
 import New from './components/sell/new';
 import SellDashboard from './components/sell/dashboard';
 import SellDetails from './components/sell/details';
 import Favorites from './components/favorite/index';
 import Edit from './components/edit/index';
 import EditUser from './components/edit/user';
+import MessageDetails from './components/message/details';
 
 const MainNavigator = createStackNavigator({
   loading: {screen: Loading},

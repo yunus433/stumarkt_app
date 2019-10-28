@@ -9,7 +9,7 @@
       "android",
       "web"
     ],
-    "version": "1.1.5",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -25,7 +25,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.stumarkt.co"
+      "bundleIdentifier": "com.stumarkt.co",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to let users to take photos of the second-hand products they will sell on the app.",
+        "NSPhotoLibraryUsageDescription": "This app uses the camera to let users to take photos of the second-hand products they will sell on the app."
+      }
+    },
+    "android": {
+      "package": "com.stumarkt.co"
     }
   }
 }

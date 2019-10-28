@@ -98,7 +98,7 @@ export default class Login extends Component{
             <TouchableOpacity
               onPress={() => {this.props.navigation.navigate('register')}} 
             >
-              <Text style={styles.bottomLinkButton} > In 30 Secunden registrieren </Text>
+              <Text style={styles.bottomLinkButton} > In 30 Sekunden registrieren </Text>
             </TouchableOpacity>
           </View>
         </View>

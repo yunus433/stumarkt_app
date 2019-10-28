@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import { AppRegistry, Text, View, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView, StatusBar} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 
 export default class Header extends Component { 
 
@@ -32,7 +31,7 @@ export default class Header extends Component {
   render() {
     return (
       <View style={styles.header} >
-        <StatusBar hidden={true} ></StatusBar>
+        <StatusBar backgroundColor="white" ></StatusBar>
         <View style={styles.headerTopLine} >
           <TouchableOpacity
             onPress={() => {this.props.navigation.push('main', {"user": this.state.user})}} 

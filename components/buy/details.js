@@ -201,11 +201,11 @@ export default class BuyDetails extends Component{
 
 const styles = StyleSheet.create({
   mainWrapper: {
-    flex: 1,
-    backgroundColor: "rgb(248, 248, 248)",
+    flex: 1
   },
   content: {
-    flex: 8, paddingBottom: 100
+    flex: 8,
+    backgroundColor: "rgb(248, 248, 248)"
   },
   innerContent: {
     padding: 20,

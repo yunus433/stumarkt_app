@@ -411,11 +411,10 @@ export default class Category extends Component{
 
 const styles = StyleSheet.create({
   mainWrapper: {
-    flex: 1,
-    backgroundColor: "rgb(248, 248, 248)",
+    flex: 1
   },
   content: {
-    flex: 8, paddingBottom: 100
+    flex: 8, backgroundColor: "rgb(248, 248, 248)",
   },
   contentTitle: {
     fontSize: 25, color: "rgb(255, 67, 148)", fontWeight: "500",
@@ -426,7 +425,7 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   universityWrapper: {
-    flex: 1, marginBottom: 10
+    flex: 3, marginBottom: 10
   },
   eachUni: {
     padding: 10, marginBottom: 5, backgroundColor: "white",
