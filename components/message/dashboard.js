@@ -153,20 +153,20 @@ export default class MessageDetails extends Component{
             <ScrollView style={{flex: 1}} >
               { this.state.messagesOn == "buyerMessages" ?
                 this.state.buyerMessages.length ?
-                this.state.buyerMessages.map((messageArray, key) => {
+                this.state.buyerMessages.map((message, key) => {
                   return (
-                    <TouchableOpacity key={key} style={styles.eachMessageWrapper} onPress={() => {this.messageDetailsButtonController("buyer", messageArray[0].buyerId, messageArray[0].productId)}} >
-                      <Image style={styles.eachMessageProductImage} source={{uri: messageArray[messageArray.length-1].productProfile}} ></Image>
+                    <TouchableOpacity key={key} style={styles.eachMessageWrapper} onPress={() => {this.messageDetailsButtonController("buyer", message.buyer, message.product)}} >
+                      <Image style={styles.eachMessageProductImage} source={{uri: message.productPhoto}} ></Image>
                       <View style={styles.eachMessageContentWrapper} >
-                        <Text style={styles.eachMessageProductName} >{messageArray[messageArray.length-1].productName}</Text>
+                        <Text style={styles.eachMessageProductName} >{message.productName}</Text>
                         <View style={{flexDirection: "row"}} >
-                          <Text style={styles.eachMessageUserName} >{messageArray[messageArray.length-1].ownerName} - </Text>
-                          <Text style={styles.eachMessageTotalNumber} >{messageArray.length} message{messageArray.length > 1 ? 's' : ''}</Text>
+                          <Text style={styles.eachMessageUserName} >{message.ownerName} - </Text>
+                          <Text style={styles.eachMessageTotalNumber} >{message.messages.length} message{message.messages.length > 1 ? 's' : ''}</Text>
                         </View>
                       </View>
-                      { messageArray.filter(message => {return !message.read && message.sendedBy == 'owner'}).length ? 
+                      { message.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == 'owner'}).length ? 
                         <View style={styles.notReadMessageNumberWrapper} >
-                          <Text style={styles.notReadMessageNumber} >{messageArray.filter(message => {return !message.read && message.sendedBy == 'owner'}).length}</Text>
+                          <Text style={styles.notReadMessageNumber} >{message.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == 'owner'}).length}</Text>
                         </View> 
                         :
                         null }
@@ -178,31 +178,24 @@ export default class MessageDetails extends Component{
                   </View>
                 :
                 this.state.ownerMessages.length ?
-                this.state.ownerMessages.map((messageProductsArray, key) => {
+                this.state.ownerMessages.map((message, key) => {
                   return (
-                    <View key={key}> 
-                      { messageProductsArray.map((messageArray, key) => {
-                          return (
-                            <TouchableOpacity key={key} style={styles.eachMessageWrapper} onPress={() => {this.messageDetailsButtonController("owner", messageArray[0].buyerId, messageArray[0].productId)}} >
-                              <Image style={styles.eachMessageProductImage} source={{uri: messageArray[messageArray.length-1].productProfile}} ></Image>
-                              <View style={styles.eachMessageContentWrapper} >
-                                <Text style={styles.eachMessageProductName} >{messageArray[messageArray.length-1].productName}</Text>
-                                <View style={{flexDirection: "row"}} >
-                                  <Text style={styles.eachMessageUserName} >{messageArray[messageArray.length-1].buyerName} - </Text>
-                                  <Text style={styles.eachMessageTotalNumber} >{messageArray.length} message{messageArray.length > 1 ? 's' : ''}</Text>
-                                </View>
-                              </View>
-                              { messageArray.filter(message => {return !message.read && message.sendedBy == 'buyer'}).length ? 
-                                <View style={styles.notReadMessageNumberWrapper} >
-                                  <Text style={styles.notReadMessageNumber} >{messageArray.filter(message => {return !message.read && message.sendedBy == 'buyer'}).length}</Text>
-                                </View> 
-                                :
-                                null }
-                            </TouchableOpacity>
-                          );
-                        })
-                      }
-                    </View>
+                    <TouchableOpacity key={key} style={styles.eachMessageWrapper} onPress={() => {this.messageDetailsButtonController("owner", message.buyer, message.product)}} >
+                      <Image style={styles.eachMessageProductImage} source={{uri: message.productPhoto}} ></Image>
+                      <View style={styles.eachMessageContentWrapper} >
+                        <Text style={styles.eachMessageProductName} >{message.productName}</Text>
+                        <View style={{flexDirection: "row"}} >
+                          <Text style={styles.eachMessageUserName} >{message.buyerName} - </Text>
+                          <Text style={styles.eachMessageTotalNumber} >{message.messages.length} message{message.messages.length > 1 ? 's' : ''}</Text>
+                        </View>
+                      </View>
+                      { message.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == 'buyer'}).length ? 
+                        <View style={styles.notReadMessageNumberWrapper} >
+                          <Text style={styles.notReadMessageNumber} >{message.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == 'buyer'}).length}</Text>
+                        </View> 
+                        :
+                        null }
+                    </TouchableOpacity>
                   )})
                   :
                   <View style={styles.noMessageWrapper} >

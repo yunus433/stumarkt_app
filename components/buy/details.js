@@ -78,14 +78,40 @@ export default class BuyDetails extends Component{
       .then(data => {
         if (data.error) return alert("Err: " + data.error);
 
-        this.props.navigation.push('messageDetails', {
-          "user": this.state.user,
-          "buyer": this.state.user,
-          "owner": data.user,
-          "product": this.state.product,
-          "messageContent": this.state.message,
-          "messagesOf": "buyer"
-        });
+        fetch(`https://www.stumarkt.com/api/newMessage`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x_auth": API_KEY
+          },
+          body: JSON.stringify({
+            "buyer": this.state.user._id,
+            "buyerName": this.state.user.name,
+            "owner": data.user._id,
+            "ownerName": data.user.name,
+            "product": this.state.product._id,
+            "productName": this.state.product.name,
+            "productPhoto": this.state.product.productPhotoArray[0],
+            "content": this.state.message,
+            "createdAt": Date.now(),
+          })
+        })
+          .then(response => {return response.json()})
+          .then(data => {
+            if (data.error)
+              return alert(data.error);
+
+            this.props.navigation.push('messageDetails', {
+              "user": this.state.user,
+              "buyer": this.state.user,
+              "owner": data.user,
+              "product": this.state.product,
+              "messagesOf": "buyer"
+            });
+          })
+          .catch(err => {
+            alert("Err: " + err);
+          });
       })
       .catch((err) => {
         return alert("Err: " + err);

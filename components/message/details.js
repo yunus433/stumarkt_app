@@ -28,7 +28,8 @@ export default class MessageDetails extends Component{
       owner: this.props.navigation.getParam('owner', false),
       product: this.props.navigation.getParam('product', false),
       messagesOf: this.props.navigation.getParam('messagesOf', false),
-      messages: []
+      messages: [],
+      message: null
     };
 
     this.scrollView = React.createRef();
@@ -47,7 +48,8 @@ export default class MessageDetails extends Component{
         if (data.error) return alert("Err: " + data.error);
 
         this.setState({
-          "messages": data.messages
+          "messages": data.message.messages,
+          "message": data.message
         });
       })
       .catch((err) => {
@@ -63,16 +65,16 @@ export default class MessageDetails extends Component{
     this.keyboardWillHideSub.remove();
   }
 
-  keyboardDidShow = (event) => {
+  keyboardWillShow = (event) => {
     this.setState({"clicked": true});
 
     Animated.parallel([
       Animated.timing(this.keyboardHeight, {
-        duration: 0,
+        duration: event.duration,
         toValue: event.endCoordinates.height,
       }),
       Animated.timing(this.messagesWrapperMarginBottom, {
-        duration: 0,
+        duration: event.duration,
         toValue: event.endCoordinates.height + this.state.messageInputWrapperHeight,
       })
     ]).start(() => {
@@ -80,14 +82,14 @@ export default class MessageDetails extends Component{
     });
   };
 
-  keyboardDidHide = (event) => {
+  keyboardWillHide = (event) => {
     Animated.parallel([
       Animated.timing(this.keyboardHeight, {
-        duration: 0,
+        duration: event.duration,
         toValue: 20,
       }),
       Animated.timing(this.messagesWrapperMarginBottom, {
-        duration: 0,
+        duration: event.duration,
         toValue: this.state.messageInputWrapperHeight
       })
     ]).start();
@@ -126,11 +128,7 @@ export default class MessageDetails extends Component{
       const newMessageObject = {
         content: this.state.messageContent,
         buyerId: this.state.buyer._id,
-        buyerName: this.state.buyer.name,
-        ownerName: this.state.owner.name,
         ownerId: this.state.owner._id,
-        productProfile: this.state.product.productPhotoArray[0],
-        productName: this.state.product.name,
         productId: this.state.product._id,
         sendedBy: this.state.messagesOf,
         read: false,
@@ -178,7 +176,7 @@ export default class MessageDetails extends Component{
                     <View key={key} style={[styles.eachMessage, {marginLeft: "auto"}]} >
                       <View style={[styles.eachMessageContent, {marginRight: 20, alignItems: "flex-end"}]} >
                         <View style={[styles.eachMessageHeader, {alignItems: "flex-end"}]} >
-                          <Text style={styles.eachMessageSenderName} >{message[message.sendedBy]}</Text>
+                          <Text style={styles.eachMessageSenderName} >{this.state.message[this.state.messagesOf].name}</Text>
                           <Text style={styles.eachMessageDate} >{message.createdAt}</Text>
                         </View>
                         <Text style={[styles.eachMessageText, {textAlign: "right"}]} >{message.content}</Text>
@@ -192,7 +190,7 @@ export default class MessageDetails extends Component{
                       <Image style={styles.eachMessageProfile} source={{uri: this.state[message.sendedBy].profilePhoto}} ></Image>
                       <View style={[styles.eachMessageContent, {marginLeft: 20}]} >
                         <View style={styles.eachMessageHeader} >
-                          <Text style={styles.eachMessageSenderName} >{message[message.sendedBy + "Name"]}</Text>
+                          <Text style={styles.eachMessageSenderName} >{this.state.message[message.sendedBy].name}</Text>
                           <Text style={styles.eachMessageDate} >{message.createdAt}</Text>
                         </View>
                         <Text style={styles.eachMessageText} >{message.content}</Text>

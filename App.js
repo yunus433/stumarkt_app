@@ -1,5 +1,4 @@
 import {createStackNavigator, createAppContainer} from 'react-navigation';
-import {Platform} from 'react-native';
 
 import Loading from './components/index/loading';
 import Index from './components/index/index';

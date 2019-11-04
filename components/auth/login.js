@@ -66,10 +66,10 @@ export default class Login extends Component{
               <Text style={styles.title} >
                 Einloggen
               </Text>
-              <TouchableOpacity style={styles.lostPasswordWrapper} >
+              {/* <TouchableOpacity style={styles.lostPasswordWrapper} >
                 <Text style={styles.lostPassword} > Passwort </Text>
                 <Text style={styles.lostPassword} > vergessen? </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <TextInput 
               style={styles.emailInput}

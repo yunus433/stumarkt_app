@@ -206,9 +206,11 @@ export default class New extends Component{
 
   componentDidMount = async () => {
     const permission = await Permissions.getAsync(Permissions.CAMERA);
-    if (permission.status !== 'granted') {
+    const permission2 = await Permissions.getAsync(Permissions.CAMERA_ROLL);
+    if (permission.status !== 'granted' || permission2.status !== 'granted') {
         const newPermission = await Permissions.askAsync(Permissions.CAMERA);
-        if (newPermission.status === 'granted') {
+        const newPermission2 = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+        if (newPermission.status === 'granted' && newPermission2.status === 'granted') {
           ImagePicker.launchCameraAsync({
             mediaTypes: "Images"
           })
