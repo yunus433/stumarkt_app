@@ -204,133 +204,263 @@ export default class New extends Component{
     }
   }
 
-  componentDidMount = async () => {
-    const permission = await Permissions.getAsync(Permissions.CAMERA);
-    const permission2 = await Permissions.getAsync(Permissions.CAMERA_ROLL);
-    if (permission.status !== 'granted' || permission2.status !== 'granted') {
-        const newPermission = await Permissions.askAsync(Permissions.CAMERA);
-        const newPermission2 = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-        if (newPermission.status === 'granted' && newPermission2.status === 'granted') {
-          ImagePicker.launchCameraAsync({
-            mediaTypes: "Images"
-          })
-          .then(res => {
-            if (res.cancelled) return this.props.navigation.push('main', {"user": this.state.user});
-    
-            ImageManipulator.manipulateAsync(
-              res.uri, 
-              [],
-              { compress: 0.4 }
-            )
-            .then(manipulatedRes => {
-              const formData = new FormData();
-              formData.append('photo', {
-                "uri": manipulatedRes.uri,
-                "name": `photo.${manipulatedRes.uri.split('.').pop()}`,
-                "type": `image/${manipulatedRes.uri.split('.').pop()}`
-              });
+  optionButtonController = async (option) => {
+    if (option == "library") {
+      const permission = await Permissions.getAsync(Permissions.CAMERA);
+      const permission2 = await Permissions.getAsync(Permissions.CAMERA_ROLL);
+      if (permission.status !== 'granted' || permission2.status !== 'granted') {
+          const newPermission = await Permissions.askAsync(Permissions.CAMERA);
+          const newPermission2 = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+          if (newPermission.status === 'granted' && newPermission2.status === 'granted') {
+            ImagePicker.launchImageLibraryAsync({
+              mediaTypes: "Images"
+            })
+            .then(res => {
+              if (res.cancelled) return this.props.navigation.push('main', {"user": this.state.user});
       
-              fetch("https://www.stumarkt.com/api/newProductImage", {
-                method: "POST",
-                body: formData,
-                headers: {
-                  Accept: 'application/json',
-                  'x_auth': API_KEY,
-                  'Content-Type': 'multipart/form-data'
-                }
-              })
-              .then(response => {return response.json()})
-              .then(data => {
-                if (data && data.error) {
-                  return this.props.navigation.push('main', {"user": this.state.user});
-                }
-      
-                if (!data || !data.fileName) {
-                  return this.props.navigation.push('main', {"user": this.state.user});
-                }
-                
-                this.setState(state => {
-                  const productPhotoArray =  state.productPhotoArray.concat(manipulatedRes.uri);
-                  const productPhotoNameArray =  state.productPhotoNameArray.concat(data.fileName);
-    
-                  return {
-                    productPhotoArray,
-                    productPhotoNameArray,
-                    "completed": true
-                  };
+              ImageManipulator.manipulateAsync(
+                res.uri, 
+                [],
+                { compress: 0.4 }
+              )
+              .then(manipulatedRes => {
+                const formData = new FormData();
+                formData.append('photo', {
+                  "uri": manipulatedRes.uri,
+                  "name": `photo.${manipulatedRes.uri.split('.').pop()}`,
+                  "type": `image/${manipulatedRes.uri.split('.').pop()}`
                 });
-              })
-              .catch(err => {
-                alert(err);
-                return this.props.navigation.push('main', {"user": this.state.user});
+        
+                fetch("https://www.stumarkt.com/api/newProductImage", {
+                  method: "POST",
+                  body: formData,
+                  headers: {
+                    Accept: 'application/json',
+                    'x_auth': API_KEY,
+                    'Content-Type': 'multipart/form-data'
+                  }
+                })
+                .then(response => {return response.json()})
+                .then(data => {
+                  if (data && data.error) {
+                    return this.props.navigation.push('main', {"user": this.state.user});
+                  }
+        
+                  if (!data || !data.fileName) {
+                    return this.props.navigation.push('main', {"user": this.state.user});
+                  }
+                  
+                  this.setState(state => {
+                    const productPhotoArray =  state.productPhotoArray.concat(manipulatedRes.uri);
+                    const productPhotoNameArray =  state.productPhotoNameArray.concat(data.fileName);
+      
+                    return {
+                      productPhotoArray,
+                      productPhotoNameArray,
+                      "completed": true
+                    };
+                  });
+                })
+                .catch(err => {
+                  alert(err);
+                  return this.props.navigation.push('main', {"user": this.state.user});
+                });
               });
+            })
+            .catch(err => {
+              alert(err);
+              return this.props.navigation.push('main', {"user": this.state.user});
             });
-          })
-          .catch(err => {
-            alert(err);
+          } else {
             return this.props.navigation.push('main', {"user": this.state.user});
-          });
-        } else {
-          return this.props.navigation.push('main', {"user": this.state.user});
-        }
-    } else {
-      ImagePicker.launchCameraAsync({
-        mediaTypes: "Images"
-      })
-      .then(res => {
-        if (res.cancelled) return this.props.navigation.push('main', {"user": this.state.user});
+          }
+      } else {
+        ImagePicker.launchImageLibraryAsync({
+          mediaTypes: "Images"
+        })
+        .then(res => {
+          if (res.cancelled) return this.props.navigation.push('main', {"user": this.state.user});
 
-        ImageManipulator.manipulateAsync(
-          res.uri, 
-          [],
-          { compress: 0.4 }
-        )
-        .then(manipulatedRes => {
-          const formData = new FormData();
-          formData.append('photo', {
-            "uri": manipulatedRes.uri,
-            "name": `photo.${manipulatedRes.uri.split('.').pop()}`,
-            "type": `image/${manipulatedRes.uri.split('.').pop()}`
-          });
-  
-          fetch("https://www.stumarkt.com/api/newProductImage", {
-            method: "POST",
-            body: formData,
-            headers: {
-              Accept: 'application/json',
-              'x_auth': API_KEY,
-              'Content-Type': 'multipart/form-data'
-            }
-          })
-          .then(response => {return response.json()})
-          .then(data => {
-            if (data && data.error)
-              return this.props.navigation.push('main', {"user": this.state.user});
-  
-            if (!data || !data.fileName)
-              return this.props.navigation.push('main', {"user": this.state.user});
-              
-            this.setState(state => {
-              const productPhotoArray =  state.productPhotoArray.concat(manipulatedRes.uri);
-              const productPhotoNameArray =  state.productPhotoNameArray.concat(data.fileName);
-    
-              return {
-                productPhotoArray,
-                productPhotoNameArray,
-                "completed": true
-              };
+          ImageManipulator.manipulateAsync(
+            res.uri, 
+            [],
+            { compress: 0.4 }
+          )
+          .then(manipulatedRes => {
+            const formData = new FormData();
+            formData.append('photo', {
+              "uri": manipulatedRes.uri,
+              "name": `photo.${manipulatedRes.uri.split('.').pop()}`,
+              "type": `image/${manipulatedRes.uri.split('.').pop()}`
             });
-          })
-          .catch(err => {
-            alert(err);
-            return this.props.navigation.push('main', {"user": this.state.user});
+    
+            fetch("https://www.stumarkt.com/api/newProductImage", {
+              method: "POST",
+              body: formData,
+              headers: {
+                Accept: 'application/json',
+                'x_auth': API_KEY,
+                'Content-Type': 'multipart/form-data'
+              }
+            })
+            .then(response => {return response.json()})
+            .then(data => {
+              if (data && data.error)
+                return this.props.navigation.push('main', {"user": this.state.user});
+    
+              if (!data || !data.fileName)
+                return this.props.navigation.push('main', {"user": this.state.user});
+                
+              this.setState(state => {
+                const productPhotoArray =  state.productPhotoArray.concat(manipulatedRes.uri);
+                const productPhotoNameArray =  state.productPhotoNameArray.concat(data.fileName);
+      
+                return {
+                  productPhotoArray,
+                  productPhotoNameArray,
+                  "completed": true
+                };
+              });
+            })
+            .catch(err => {
+              alert(err);
+              return this.props.navigation.push('main', {"user": this.state.user});
+            });
           });
+        })
+        .catch(err => {
+          alert(err);
+          return this.props.navigation.push('main', {"user": this.state.user});
         });
-      })
-      .catch(err => {
-        alert(err);
-        return this.props.navigation.push('main', {"user": this.state.user});
-      });
+      }
+    } else {
+      const permission = await Permissions.getAsync(Permissions.CAMERA);
+      const permission2 = await Permissions.getAsync(Permissions.CAMERA_ROLL);
+      if (permission.status !== 'granted' || permission2.status !== 'granted') {
+          const newPermission = await Permissions.askAsync(Permissions.CAMERA);
+          const newPermission2 = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+          if (newPermission.status === 'granted' && newPermission2.status === 'granted') {
+            ImagePicker.launchCameraAsync({
+              mediaTypes: "Images"
+            })
+            .then(res => {
+              if (res.cancelled) return this.props.navigation.push('main', {"user": this.state.user});
+      
+              ImageManipulator.manipulateAsync(
+                res.uri, 
+                [],
+                { compress: 0.4 }
+              )
+              .then(manipulatedRes => {
+                const formData = new FormData();
+                formData.append('photo', {
+                  "uri": manipulatedRes.uri,
+                  "name": `photo.${manipulatedRes.uri.split('.').pop()}`,
+                  "type": `image/${manipulatedRes.uri.split('.').pop()}`
+                });
+        
+                fetch("https://www.stumarkt.com/api/newProductImage", {
+                  method: "POST",
+                  body: formData,
+                  headers: {
+                    Accept: 'application/json',
+                    'x_auth': API_KEY,
+                    'Content-Type': 'multipart/form-data'
+                  }
+                })
+                .then(response => {return response.json()})
+                .then(data => {
+                  if (data && data.error) {
+                    return this.props.navigation.push('main', {"user": this.state.user});
+                  }
+        
+                  if (!data || !data.fileName) {
+                    return this.props.navigation.push('main', {"user": this.state.user});
+                  }
+                  
+                  this.setState(state => {
+                    const productPhotoArray =  state.productPhotoArray.concat(manipulatedRes.uri);
+                    const productPhotoNameArray =  state.productPhotoNameArray.concat(data.fileName);
+      
+                    return {
+                      productPhotoArray,
+                      productPhotoNameArray,
+                      "completed": true
+                    };
+                  });
+                })
+                .catch(err => {
+                  alert(err);
+                  return this.props.navigation.push('main', {"user": this.state.user});
+                });
+              });
+            })
+            .catch(err => {
+              alert(err);
+              return this.props.navigation.push('main', {"user": this.state.user});
+            });
+          } else {
+            return this.props.navigation.push('main', {"user": this.state.user});
+          }
+      } else {
+        ImagePicker.launchCameraAsync({
+          mediaTypes: "Images"
+        })
+        .then(res => {
+          if (res.cancelled) return this.props.navigation.push('main', {"user": this.state.user});
+  
+          ImageManipulator.manipulateAsync(
+            res.uri, 
+            [],
+            { compress: 0.4 }
+          )
+          .then(manipulatedRes => {
+            const formData = new FormData();
+            formData.append('photo', {
+              "uri": manipulatedRes.uri,
+              "name": `photo.${manipulatedRes.uri.split('.').pop()}`,
+              "type": `image/${manipulatedRes.uri.split('.').pop()}`
+            });
+    
+            fetch("https://www.stumarkt.com/api/newProductImage", {
+              method: "POST",
+              body: formData,
+              headers: {
+                Accept: 'application/json',
+                'x_auth': API_KEY,
+                'Content-Type': 'multipart/form-data'
+              }
+            })
+            .then(response => {return response.json()})
+            .then(data => {
+              if (data && data.error)
+                return this.props.navigation.push('main', {"user": this.state.user});
+    
+              if (!data || !data.fileName)
+                return this.props.navigation.push('main', {"user": this.state.user});
+                
+              this.setState(state => {
+                const productPhotoArray =  state.productPhotoArray.concat(manipulatedRes.uri);
+                const productPhotoNameArray =  state.productPhotoNameArray.concat(data.fileName);
+      
+                return {
+                  productPhotoArray,
+                  productPhotoNameArray,
+                  "completed": true
+                };
+              });
+            })
+            .catch(err => {
+              alert(err);
+              return this.props.navigation.push('main', {"user": this.state.user});
+            });
+          });
+        })
+        .catch(err => {
+          alert(err);
+          return this.props.navigation.push('main', {"user": this.state.user});
+        });
+      }
     }
   }
 
@@ -473,7 +603,20 @@ export default class New extends Component{
               <NavBar navigation={this.props.navigation} ></NavBar>
             </View>
           :
-          <ActivityIndicator size="large" color="rgb(255, 67, 148)" />
+          <View style={{flex: 1, justifyContent: "center", alignItems: "center"}} >
+            <ActivityIndicator size="large" color="rgb(255, 67, 148)" />
+            <View style={styles.photoOptionsWrapper} >
+              <Text style={styles.optionsTitle} >Foto hochladen</Text>
+              <View style={styles.buttonWrapper} >
+                <TouchableOpacity style={[styles.optionButtons, {marginRight: 5}]} onPress={() => {this.optionButtonController("library")}} >
+                  <Text style={styles.optionButtonsText} >Foto auswählen</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.optionButtons, {marginLeft: 5}]} onPress={() => {this.optionButtonController("camera")}}>
+                  <Text style={styles.optionButtonsText} >Foto aufnehmen</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
         }
       </View>
     );
@@ -484,6 +627,25 @@ const styles = StyleSheet.create({
   mainWrapper: {
     flex: 1, justifyContent: "center", alignItems: "center",
     backgroundColor: "rgb(248, 248, 248)",
+  },
+  photoOptionsWrapper: {
+    position: "absolute", backgroundColor: "white",
+    padding: 25, width: "90%",
+    borderColor: "rgb(236, 236, 236)", borderWidth: 2, borderRadius: 15
+  },
+  optionsTitle: {
+    color: "rgb(255, 67, 148)", fontSize: 18, fontWeight: "600"
+  },
+  buttonWrapper: {
+    flexDirection: "row", marginTop: 20
+  },
+  optionButtons: {
+    padding: 10, flex: 1,
+    borderColor: "rgb(236, 236, 236)", borderWidth: 2, borderRadius: 15
+  },
+  optionButtonsText: {
+    color: "rgb(112, 112, 112)", fontSize: 16, fontWeight: "600",
+    textAlign: "center"
   },
   content: {
     flex: 8

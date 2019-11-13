@@ -56,8 +56,8 @@ export default class MessageDetails extends Component{
         return alert("Err: " + err);
       });
 
-    this.keyboardWillShowSub = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
-    this.keyboardWillHideSub = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
+    this.keyboardWillShowSub = Keyboard.addListener('keyboardDidShow', this.keyboardWillShow);
+    this.keyboardWillHideSub = Keyboard.addListener('keyboardDidHide', this.keyboardWillHide);
   };
 
   componentWillUnmount() {
@@ -70,26 +70,27 @@ export default class MessageDetails extends Component{
 
     Animated.parallel([
       Animated.timing(this.keyboardHeight, {
-        duration: event.duration,
-        toValue: event.endCoordinates.height,
+        duration: 0,
+        toValue: event.endCoordinates.height + 10,
       }),
       Animated.timing(this.messagesWrapperMarginBottom, {
-        duration: event.duration,
+        duration: 0,
         toValue: event.endCoordinates.height + this.state.messageInputWrapperHeight,
       })
-    ]).start(() => {
-      this.scrollView.current._component.scrollToEnd({animated: false});
-    });
+    ]).start();
+    setTimeout(() => {
+      this.scrollView.current._component.scrollToEnd({animated: true});
+    }, 10);
   };
 
   keyboardWillHide = (event) => {
     Animated.parallel([
       Animated.timing(this.keyboardHeight, {
-        duration: event.duration,
+        duration: 0,
         toValue: 20,
       }),
       Animated.timing(this.messagesWrapperMarginBottom, {
-        duration: event.duration,
+        duration: 0,
         toValue: this.state.messageInputWrapperHeight
       })
     ]).start();

@@ -238,6 +238,7 @@ export default class Index extends Component{
                 </TextInput>
                 <Text style={styles.inputTitle} >Neues Passwort (min. 6-stelling):</Text>
                 <TextInput 
+                  secureTextEntry={true}
                   style={styles.formInput}
                   placeholder="Passwort"
                   onChangeText={(password) => {this.setState({password: password})}}
@@ -245,6 +246,7 @@ export default class Index extends Component{
                 </TextInput>
                 <Text style={styles.inputTitle} >Neues Passwort wiederholen:</Text>
                 <TextInput 
+                  secureTextEntry={true}
                   style={styles.formInput}
                   placeholder="Passwort Wiederholen"
                   onChangeText={(confirmPassword) => {this.setState({confirmPassword: confirmPassword})}}

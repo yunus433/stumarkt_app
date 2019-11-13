@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { AsyncStorage, AppRegistry, Text, View, StyleSheet, TextInput, Image, TouchableOpacity, Keyboard} from 'react-native';
+import { AsyncStorage, AppRegistry, TouchableWithoutFeedback, Text, View, StyleSheet, TextInput, Image, TouchableOpacity, Keyboard} from 'react-native';
 import { API_KEY } from 'react-native-dotenv'
 
 export default class Login extends Component{
@@ -58,7 +58,7 @@ export default class Login extends Component{
 
   render() {
     return (
-      <View style={styles.mainWrapper}>
+      <TouchableWithoutFeedback style={styles.mainWrapper}  onPress={() => {Keyboard.dismiss()}}>
         <View style={styles.innerWrapper} >
           <Image source={require('./../../assets/main-icon.png')} style={styles.logo} ></Image>
           <View style={styles.formWrapper}>
@@ -77,7 +77,8 @@ export default class Login extends Component{
               onChangeText={(email) => { this.setState({email: email})}}
             >
             </TextInput>
-            <TextInput 
+            <TextInput
+              secureTextEntry={true}
               style={styles.passwordInput}
               placeholder="Passwort"
               onChangeText={(password) => {this.setState({password: password})}}
@@ -102,7 +103,7 @@ export default class Login extends Component{
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 }
@@ -110,14 +111,12 @@ export default class Login extends Component{
 const styles = StyleSheet.create({
   mainWrapper: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgb(248, 248, 248)",
-    padding: 25
+    justifyContent: "center", alignItems: "center",
+    backgroundColor: "rgb(248, 248, 248)", padding: 25
   },
   innerWrapper: {
-    flex: 1
+    flex: 1,
+    margin: 25, marginTop: "50%"
   },
   logo: {
     height: 50,

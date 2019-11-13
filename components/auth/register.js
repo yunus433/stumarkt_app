@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { AppRegistry, Text, View, StyleSheet, TextInput, Image, ScrollView, TouchableOpacity} from 'react-native';
+import { AppRegistry, Keyboard, TouchableWithoutFeedback, Text, View, StyleSheet, TextInput, Image, ScrollView, TouchableOpacity} from 'react-native';
 import { API_KEY } from 'react-native-dotenv'
 
 export default class Register extends Component {
@@ -257,6 +257,7 @@ export default class Register extends Component {
   }
 
   nextButtonController = () => {
+    Keyboard.dismiss()
     if (this.state.name && this.state.email && this.state.password && this.state.passwordConfirm) {
       if (this.state.password.length >= 6) {
         if (this.state.password == this.state.passwordConfirm) {
@@ -282,6 +283,7 @@ export default class Register extends Component {
   }
 
   registerButtonController = () => {
+    Keyboard.dismiss()
     if (this.state.university.length) {
       fetch(`https://www.stumarkt.com/api/register?email=${this.state.email}&name=${this.state.name}&password=${this.state.password}&university=${this.state.university}` , {
         headers: {
@@ -336,7 +338,7 @@ export default class Register extends Component {
 
   render() {
     return (
-      <View style={styles.mainWrapper}>
+      <TouchableWithoutFeedback style={styles.mainWrapper} onPress={() => {Keyboard.dismiss()}}>
         <View style={styles.innerWrapper} >
           { !this.state.onUniversity ?
             <View style={styles.formWrapper}>
@@ -357,13 +359,15 @@ export default class Register extends Component {
                 onChangeText={(email) => {this.setState({email: email})}}
               >
               </TextInput>
-              <TextInput 
+              <TextInput
+                secureTextEntry={true}
                 style={styles.formInput}
                 placeholder="Passwort"
                 onChangeText={(password) => {this.setState({password: password})}}
               >
               </TextInput>
-              <TextInput 
+              <TextInput
+                secureTextEntry={true}
                 style={styles.formInput}
                 placeholder="Passwort wiederholen"
                 onChangeText={(password) => {this.setState({passwordConfirm: password})}}
@@ -385,7 +389,7 @@ export default class Register extends Component {
               </View>
               <View style={styles.universitySearchWrapper} >
               <Image source={require('./../../assets/search-icon.png')} style={styles.universitySearchLogo} ></Image>
-                <TextInput style={styles.universitySearchInput} placeholder="Search" onChangeText={(text) => {this.searchUniversityController(text)}} ></TextInput>
+                <TextInput style={styles.universitySearchInput} placeholder="Suche" onChangeText={(text) => {this.searchUniversityController(text)}} ></TextInput>
               </View>
               <ScrollView style={styles.universityWrapper} >
                 { this.state.universityList.length ?
@@ -426,7 +430,7 @@ export default class Register extends Component {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 }
@@ -434,12 +438,13 @@ export default class Register extends Component {
 const styles = StyleSheet.create({
   mainWrapper: {
     flex: 1,
-    flexDirection: "row", justifyContent: "center", alignItems: "center",
+    justifyContent: "center", alignItems: "center",
     backgroundColor: "rgb(248, 248, 248)",
     padding: 25
   },
   innerWrapper: {
-    flex: 1
+    flex: 1,
+    margin: 25, marginTop: "50%"
   },
   formWrapper: {
     backgroundColor: "white",

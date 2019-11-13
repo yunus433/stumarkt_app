@@ -149,10 +149,10 @@ export default class SellDetails extends Component{
                 <Text style={styles.contentTitle} >Anzeige Einstellungen</Text>
                 <View style={styles.productOptionsWrapper} >
                   <TouchableOpacity style={styles.productOptionButton} onPress={() => {this.deleteProductButtonController()}} >
-                    <Text style={styles.productOptionText} >Lösch die Anzeige</Text>
+                    <Text style={styles.productOptionText} >Anzeige löschen</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.productOptionButton} onPress={() => {this.markProductAsSoldButtonController()}} >
-                    <Text style={styles.productOptionText} >Markiere das Produkt als Verkauft</Text>
+                    <Text style={styles.productOptionText} >Produkt als verkauft markieren</Text>
                   </TouchableOpacity>
                 </View>
                 <Text style={styles.contentTitle} >Anzeigendetails</Text>
@@ -210,7 +210,7 @@ export default class SellDetails extends Component{
               <View style={styles.mainInnerWrapper} >
                 <Text style={styles.markAsSoldText} >Du hast deine Anzeigen als “verkauft” markiert.</Text>
                 <TouchableOpacity style={styles.productOptionButton} onPress={() => {this.deleteProductButtonController()}} >
-                  <Text style={styles.productOptionText} >Lösch die Anzeige</Text>
+                  <Text style={styles.productOptionText} >Anzeige löschen</Text>
                 </TouchableOpacity>
               </View>
             }
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgb(248, 248, 248)",
   },
   content: {
-    flex: 8, 
+    flex: 8, marginTop: 20,
     paddingLeft: 20, paddingRight: 20, paddingBottom: 100
   },
   innnerContent: {
