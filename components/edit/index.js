@@ -20,6 +20,7 @@ export default class Index extends Component{
     try {
       await AsyncStorage.removeItem('email');
       await AsyncStorage.removeItem('password');
+      await AsyncStorage.removeItem('notificationPermissionStatus');
       this.props.navigation.navigate('login')
     }
     catch(exception) {

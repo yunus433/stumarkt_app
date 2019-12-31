@@ -19,13 +19,20 @@ export default class Loading extends Component{
           }
           })
           .then(response => {return response.json()})
-          .then(data => {
+          .then(async (data) => {
             if (data.error || !data.user)
               return this.props.navigation.push('login'); 
+            
+              if (data.user.notificationToken == null) {
+                await AsyncStorage.removeItem('notificationPermissionStatus');
 
-            this.props.navigation.push('main', {"user": data.user});
+                this.props.navigation.push('main', {"user": data.user});
+              } else {
+                this.props.navigation.push('main', {"user": data.user});
+              }
           })
           .catch(err => {
+            console.log(err);
             this.props.navigation.push('login');
           });
       } else {

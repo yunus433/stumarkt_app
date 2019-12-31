@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
-import {AppRegistry, Text, View, StyleSheet, Image, TouchableOpacity, ScrollView} from 'react-native';
-import { API_KEY } from 'react-native-dotenv'
+import {AsyncStorage, AppRegistry, Text, View, StyleSheet, Image, TouchableOpacity, ScrollView} from 'react-native';
+import { API_KEY } from 'react-native-dotenv';
+import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
 
 import Header from './../partials/header';
 import NavBar from './../partials/navBar';
@@ -115,12 +117,71 @@ export default class Index extends Component{
       this.props.navigation.push('buyDetails', {"user": this.state.user, "id": productId})
   }
 
-  componentDidMount() {
+  sendUserNotificationToken = async () => {
+    const token = await Notifications.getExpoPushTokenAsync();
+    
+    fetch("https://www.stumarkt.com/api/notifications", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x_auth": API_KEY
+      },
+      body: JSON.stringify({
+        "id": this.state.user._id,
+        "token": token
+      })
+    })
+    .then(response => {response.json()})
+    .then(data => {
+      if (data && data.error)
+        return alert("Err: " + data.error);
+      if (!data || !data.user)
+        return alert("Err: An unknown error occured");
+  
+      this.setState({
+        "user": data.user
+      });
+    })
+    .catch(err => {
+      return alert("Err: " + err);
+    });
+  }
+
+  addNotificationStatusToAsyncStorage = async (status) => {
+    try {
+      await AsyncStorage.setItem('notificationPermissionStatus', status);
+    } catch (error) {
+      alert("An unknown error occured, please try again.");
+    }
+  }
+
+  getNotificationPermission = async () => {
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+
+      if (status === 'granted') {
+        this.sendUserNotificationToken();
+        this.addNotificationStatusToAsyncStorage("allowed");
+      } else {
+        this.addNotificationStatusToAsyncStorage("not allowed");
+      }
+  }
+
+  componentDidMount = async () => {
     if (this.state.user && !this.state.user.verified) {
       return this.props.navigation.navigate('verify', {"user": this.state.user})
+    } else {
+      this.getLatestProducts(this.state.page);
+
+      try {
+        const notificationPermissionStatus = await AsyncStorage.getItem('notificationPermissionStatus');
+
+        if (notificationPermissionStatus == null)
+          this.getNotificationPermission();
+      } catch (error) {
+        alert("Err: " + error);
+        this.getNotificationPermission();
+      }
     }
-    
-    this.getLatestProducts(this.state.page);
   }
 
   addToFavorites = (id) => {
