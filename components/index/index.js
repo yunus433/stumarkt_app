@@ -131,16 +131,15 @@ export default class Index extends Component{
         "token": token
       })
     })
-    .then(response => {response.json()})
+    .then(response => {return response.json()})
     .then(data => {
       if (data && data.error)
         return alert("Err: " + data.error);
-      if (!data || !data.user)
-        return alert("Err: An unknown error occured");
   
-      this.setState({
-        "user": data.user
-      });
+      if (data && data.user)
+        this.setState({
+          "user": data.user
+        });
     })
     .catch(err => {
       return alert("Err: " + err);
@@ -156,14 +155,20 @@ export default class Index extends Component{
   }
 
   getNotificationPermission = async () => {
-      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-
-      if (status === 'granted') {
-        this.sendUserNotificationToken();
-        this.addNotificationStatusToAsyncStorage("allowed");
-      } else {
-        this.addNotificationStatusToAsyncStorage("not allowed");
-      }
+    const permission = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    if (permission.status !== 'granted') {
+        const newPermission = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+        if (newPermission.status === 'granted') {
+          this.sendUserNotificationToken();
+          this.addNotificationStatusToAsyncStorage("allowed");
+        } else {
+          this.addNotificationStatusToAsyncStorage("not allowed");
+        }
+    } else {
+      alert("You already give notification permission");
+      this.sendUserNotificationToken();
+      this.addNotificationStatusToAsyncStorage("allowed");
+    }
   }
 
   componentDidMount = async () => {
@@ -178,8 +183,7 @@ export default class Index extends Component{
         if (notificationPermissionStatus == null)
           this.getNotificationPermission();
       } catch (error) {
-        alert("Err: " + error);
-        this.getNotificationPermission();
+        return alert("Err: " + error);
       }
     }
   }
