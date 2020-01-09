@@ -165,7 +165,6 @@ export default class Index extends Component{
           this.addNotificationStatusToAsyncStorage("not allowed");
         }
     } else {
-      alert("You already give notification permission");
       this.sendUserNotificationToken();
       this.addNotificationStatusToAsyncStorage("allowed");
     }
