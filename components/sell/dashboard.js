@@ -19,7 +19,7 @@ export default class SellDashboard extends Component{
   };
 
   getUserProducts = () => {
-    fetch(`https://www.stumarkt.com/api/products?owner=${this.state.user._id}`, {
+    fetch(`https://stumarkt.herokuapp.com/api/products?owner=${this.state.user._id}`, {
         headers: {
           "x_auth": API_KEY
         }
@@ -48,8 +48,8 @@ export default class SellDashboard extends Component{
         <Header navigation={this.props.navigation}></Header>
         <View style={styles.content} >
           <View style={{padding: 20, flex: 1}} >
-            <Text style={styles.contentTitle} >Anzeigen</Text>
-            <Text style={styles.contentInfo} >Hier kannst du deine Anzeigen bearbeiten, wenn du darauf klickst.</Text>
+            <Text style={styles.contentTitle} >Ürünler</Text>
+            <Text style={styles.contentInfo} >Bu sayfadan eklediğiniz ürünleri görebilir ve düzenleyebilirsin.</Text>
             { this.state.products.length ?
               <ScrollView ref="_innerContentScrollView" >
                 {
@@ -71,9 +71,9 @@ export default class SellDashboard extends Component{
               </ScrollView>
               :
               <View style={styles.noProductWrapper} >
-                <Text style={styles.noProductText} >Du hast nun keine Anzeige, gib jetzt eine Anzeige auf!</Text>
+                <Text style={styles.noProductText} >Hiçbir ürün eklememişsin, hemen ekle!</Text>
                 <TouchableOpacity style={styles.createNewProductButton} onPress={() => {this.props.navigation.push('new', {"user": this.state.user})}} >
-                  <Text style={styles.createNewProductButtonText} >Anzeige Aufgeben</Text>
+                  <Text style={styles.createNewProductButtonText} >Ürün Ekle</Text>
                 </TouchableOpacity>
               </View>
             }

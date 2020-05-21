@@ -25,7 +25,7 @@ export default class SellDetails extends Component{
   };
 
   componentWillMount = () => {
-    fetch(`https://www.stumarkt.com/api/products?id=${this.state.productId}`, {
+    fetch(`https://stumarkt.herokuapp.com/api/products?id=${this.state.productId}`, {
       headers: {
         "x_auth": API_KEY
       }
@@ -55,7 +55,7 @@ export default class SellDetails extends Component{
   }
 
   editProductButtonController = () => {
-    fetch('https://www.stumarkt.com/api/editProduct', {
+    fetch('https://stumarkt.herokuapp.com/api/editProduct', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -84,7 +84,7 @@ export default class SellDetails extends Component{
   }
 
   markProductAsSoldButtonController = () => {
-    fetch('https://www.stumarkt.com/api/editProduct', {
+    fetch('https://stumarkt.herokuapp.com/api/editProduct', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -113,7 +113,7 @@ export default class SellDetails extends Component{
   };
 
   deleteProductButtonController = () => {
-    fetch('https://www.stumarkt.com/api/editProduct', {
+    fetch('https://stumarkt.herokuapp.com/api/editProduct', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -146,35 +146,35 @@ export default class SellDetails extends Component{
           <ScrollView style={styles.innnerContent} >
             { this.state.product.price != "SOLD" ?
               <View style={styles.mainInnerWrapper} >
-                <Text style={styles.contentTitle} >Anzeige Einstellungen</Text>
+                <Text style={styles.contentTitle} >Ürünü Düzenle</Text>
                 <View style={styles.productOptionsWrapper} >
                   <TouchableOpacity style={styles.productOptionButton} onPress={() => {this.deleteProductButtonController()}} >
-                    <Text style={styles.productOptionText} >Anzeige löschen</Text>
+                    <Text style={styles.productOptionText} >Ürünü Sil</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.productOptionButton} onPress={() => {this.markProductAsSoldButtonController()}} >
-                    <Text style={styles.productOptionText} >Produkt als verkauft markieren</Text>
+                    <Text style={styles.productOptionText} >Ürünü Satıldı Olarak İşaretle</Text>
                   </TouchableOpacity>
                 </View>
-                <Text style={styles.contentTitle} >Anzeigendetails</Text>
+                <Text style={styles.contentTitle} >Ürün Detayları</Text>
                 <TextInput 
-                  placeholder="Titel" 
+                  placeholder="Ürün İsmi" 
                   onChangeText={(name) => { this.setState({name: name})}} 
                   style={styles.nameInput} >
                 {this.state.name}
                 </TextInput>
                 <TextInput 
-                  placeholder="Beschreibung" 
+                  placeholder="Ürün Açıklaması" 
                   onChangeText={(description) => { this.setState({description: description})}}
                   style={styles.descriptionInput} 
                   multiline={true} >
                 {this.state.description}
                 </TextInput>
-                <Text style={styles.contentTitle} >Preis</Text>
+                <Text style={styles.contentTitle} >Ürün Fiyatı</Text>
                 <View style={styles.priceWrapper} >
                   <TouchableOpacity onPress={() => this.priceInput(this.state.otherPrice)} style={styles.eachPriceWrapper} >
                       <View style={ this.state.price != "free" && this.state.otherPrice ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
                       <TextInput 
-                        placeholder="Preis €" 
+                        placeholder="Fiyat (₺)" 
                         onChangeText={(price) => {this.priceInput(price)}} 
                         style={styles.priceInput} >
                       {this.state.otherPrice}
@@ -182,35 +182,35 @@ export default class SellDetails extends Component{
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => this.priceInput("free")} style={styles.eachPriceWrapper} >
                     <View style={ this.state.price == "free" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                    <Text style={styles.eachPriceText} > Zu Verschenken </Text>
+                    <Text style={styles.eachPriceText} >Hediye Ürün (ücretsiz)</Text>
                   </TouchableOpacity>
                 </View>
-                <Text style={styles.contentTitle} >Ort</Text>
+                <Text style={styles.contentTitle} >Şehir</Text>
                 <TextInput
-                  placeholder="Ort" 
+                  placeholder="Şehir" 
                   onChangeText={(address) => { this.setState({address: address})}}
                   style={styles.addressInput} >
                 {this.state.address}
                 </TextInput>
-                <Text style={styles.contentTitle} >Veröffentliche deine Anzeige</Text>
+                <Text style={styles.contentTitle} >Gizlilik Antlaşmaları:</Text>
                 <View style={styles.agreementWrapper} >
-                  <Text style={styles.agreementText} >Ich bin mit den Folgenden einverstanden: </Text>
+                  <Text style={styles.agreementText} >Bu ürünü oluşturarak aşağıdaki antlaşmaları kabul etmiş olursun: </Text>
                   <TouchableOpacity>
-                    <Text style={styles.agreementLink} >Nutzungsbedingungen</Text>
+                    <Text style={styles.agreementLink} >Hizmet Koşulları</Text>
                   </TouchableOpacity>
                   <TouchableOpacity>
-                    <Text style={styles.agreementLink} >Datenschutzerklärung</Text>
+                    <Text style={styles.agreementLink} >Gizlilik Sözleşmesi</Text>
                   </TouchableOpacity>
                 </View>
                 <TouchableOpacity style={styles.sendButton} onPress={() => {this.editProductButtonController()}} >
-                  <Text style={styles.sendButtonText} >Einstellungen</Text>
+                  <Text style={styles.sendButtonText} >Düzenle</Text>
                 </TouchableOpacity>
               </View>
               :
               <View style={styles.mainInnerWrapper} >
-                <Text style={styles.markAsSoldText} >Du hast deine Anzeigen als “verkauft” markiert.</Text>
+                <Text style={styles.markAsSoldText} >Bu ürünü satıldı olarak işaretlediniz</Text>
                 <TouchableOpacity style={styles.productOptionButton} onPress={() => {this.deleteProductButtonController()}} >
-                  <Text style={styles.productOptionText} >Anzeige löschen</Text>
+                  <Text style={styles.productOptionText} >Ürünü Sil</Text>
                 </TouchableOpacity>
               </View>
             }

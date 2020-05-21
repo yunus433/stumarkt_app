@@ -27,7 +27,7 @@ export default class BuyDetails extends Component{
     if (!this.state.productId)
       return this.props.navigation.push('main', {"user": this.state.user});
 
-    fetch(`https://www.stumarkt.com/api/products?id=${this.state.productId}`, {
+    fetch(`https://stumarkt.herokuapp.com/api/products?id=${this.state.productId}`, {
         headers: {
           "x_auth": API_KEY
         }
@@ -49,7 +49,7 @@ export default class BuyDetails extends Component{
   };
 
   getLatestProducts = (product) => {
-    fetch(`https://www.stumarkt.com/api/products?limit=5&category=${product.category}`, {
+    fetch(`https://stumarkt.herokuapp.com/api/products?limit=5&category=${product.category}`, {
         headers: {
           "x_auth": API_KEY
         }
@@ -69,7 +69,7 @@ export default class BuyDetails extends Component{
   };
 
   sendMessage = () => {
-    fetch('https://www.stumarkt.com/api/users?id=' + this.state.product.owner, {
+    fetch('https://stumarkt.herokuapp.com/api/users?id=' + this.state.product.owner, {
       headers: {
         "x_auth": API_KEY
       }
@@ -78,7 +78,7 @@ export default class BuyDetails extends Component{
       .then(data => {
         if (data.error) return alert("Err: " + data.error);
 
-        fetch(`https://www.stumarkt.com/api/newMessage`, {
+        fetch(`https://stumarkt.herokuapp.com/api/newMessage`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -123,7 +123,7 @@ export default class BuyDetails extends Component{
   }
   
   addToFavorites = (id) => {
-    fetch(`https://www.stumarkt.com/api/addToFavorite?id=${this.state.user._id}`, {
+    fetch(`https://stumarkt.herokuapp.com/api/addToFavorite?id=${this.state.user._id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -174,7 +174,7 @@ export default class BuyDetails extends Component{
                 null
               }
               <Text style={styles.productName} >{this.state.product.name}</Text>
-              <Text style={styles.productCreatedAt} >Added {this.state.product.createdAt}</Text>
+              <Text style={styles.productCreatedAt} >{this.state.product.createdAt} tarihinde eklendi.</Text>
               <View style={styles.productLocationWrapper} >
                 <Image source={require('./../../assets/location-logo.png')} style={styles.productLocationLogo} ></Image>
                 <Text style={styles.productLocation} >{this.state.product.location}</Text>
@@ -192,14 +192,14 @@ export default class BuyDetails extends Component{
               </View>
             </View>
             <View style={styles.messagesWrapper} >
-              <Text style={styles.messagesTitle} >Nachricht schreiben</Text>
+              <Text style={styles.messagesTitle} >Mesaj Gönder</Text>
               <TextInput style={styles.messagesInput} placeholder="Nachricht" multiline={true} onChangeText={(message) => {this.setState({message})}} ></TextInput>
               <TouchableOpacity style={styles.messageSendButton} onPress={() => {this.sendMessage()}} >
-                <Text style={styles.messageSendButtonText} >Nachricht Senden</Text>
+                <Text style={styles.messageSendButtonText} >Yolla</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.latestProductsWrapper}  >
-              <Text style={styles.latestProductsTitle} >Ähnliche Anzeigen</Text>
+              <Text style={styles.latestProductsTitle} >Benzer Ürünler</Text>
               {
                 this.state.latestProducts.map((product, key) => {
                   return (

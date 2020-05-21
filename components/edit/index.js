@@ -24,7 +24,7 @@ export default class Index extends Component{
       this.props.navigation.navigate('login')
     }
     catch(exception) {
-      alert("Err: An unknown error occured");
+      alert("Err: Bilinmeyen bir hata oluştu");
     }
   }
 
@@ -43,10 +43,10 @@ export default class Index extends Component{
               <Text style={styles.userUni} >{this.state.user.university}</Text>
             </View>
             <TouchableOpacity style={styles.productsButton} onPress={() => {this.props.navigation.navigate('sellDashboard', {'user': this.state.user})}}>
-              <Text style={styles.productsButtonText} >Meine Anzeigen</Text>
+              <Text style={styles.productsButtonText} >Ürünlerim: </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.logoutButton} onPress={() => {this.logoutButtonController()}}>
-              <Text style={styles.logoutButtonText} >Ausloggen</Text>
+              <Text style={styles.logoutButtonText} >Çıkış Yap</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>

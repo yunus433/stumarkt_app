@@ -13,7 +13,7 @@ export default class Loading extends Component{
       const password = await AsyncStorage.getItem('password');
 
       if (email != null && password != null) {
-        await fetch("https://www.stumarkt.com/api/login?email=" + email + "&password=" + password, {
+        await fetch("https://stumarkt.herokuapp.com/api/login?email=" + email + "&password=" + password, {
           headers: {
             "x_auth": API_KEY
           }

@@ -46,7 +46,7 @@ export default class Index extends Component{
       page = this.state.page;
 
     if (this.state.universities) {
-      fetch(`https://www.stumarkt.com/api/products?category=${this.state.category}&limit=${this.state.productNumberPerPage}&page=${page}&keywords=${this.state.search}&filter=${this.state.universities.join(',')}`, {
+      fetch(`https://stumarkt.herokuapp.com/api/products?category=${this.state.category}&limit=${this.state.productNumberPerPage}&page=${page}&keywords=${this.state.search}&filter=${this.state.universities.join(',')}`, {
         headers: {
           "x_auth": API_KEY
         }
@@ -68,7 +68,7 @@ export default class Index extends Component{
         alert("Error: " + err)
       });
     } else {
-      fetch(`https://www.stumarkt.com/api/products?category=${this.state.category}&limit=${this.state.productNumberPerPage}&page=${page}&keywords=${this.state.search}`, {
+      fetch(`https://stumarkt.herokuapp.com/api/products?category=${this.state.category}&limit=${this.state.productNumberPerPage}&page=${page}&keywords=${this.state.search}`, {
         headers: {
           "x_auth": API_KEY
         }
@@ -110,9 +110,9 @@ export default class Index extends Component{
     }
   }
 
-  eachProductOnPress = (productId) => {
-    if (this.state.user && productId == this.state.user._id)
-      this.props.navigation.push('sellDetails', {"user": this.state.user, "id": productId})
+  eachProductOnPress = (productId, owner) => {
+    if (this.state.user && owner == this.state.user._id)
+      this.props.navigation.push('sellDetails', {"user": this.state.user, "productId": productId})
     else
       this.props.navigation.push('buyDetails', {"user": this.state.user, "id": productId})
   }
@@ -120,7 +120,7 @@ export default class Index extends Component{
   sendUserNotificationToken = async () => {
     const token = await Notifications.getExpoPushTokenAsync();
     
-    fetch("https://www.stumarkt.com/api/notifications", {
+    fetch("https://stumarkt.herokuapp.com/api/notifications", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -188,7 +188,7 @@ export default class Index extends Component{
   }
 
   addToFavorites = (id) => {
-    fetch(`https://www.stumarkt.com/api/addToFavorite?id=${this.state.user._id}`, {
+    fetch(`https://stumarkt.herokuapp.com/api/addToFavorite?id=${this.state.user._id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -201,7 +201,7 @@ export default class Index extends Component{
       .then(response => {return response.json()})
       .then(data => {
         if (data.error) return alert("Err: " + data.error);
-        if (!data.user) return alert("Err: An unknown erro occured, please try again.");
+        if (!data.user) return alert("Err: Bilinmeye bir hata oluştu, lütfen tekrar deneyin.");
 
         this.setState({
           "user": data.user
@@ -217,12 +217,12 @@ export default class Index extends Component{
       <View style={styles.mainWrapper}>
         <Header navigation={this.props.navigation} ></Header>
         <View style={styles.content} >
-          <Text style={styles.contentTitle} > {this.state.totalProductNumber} Produkte in dieser Kategorie verfügbar ({this.state.categoryName}){this.state.search ? ` with the keyword${this.state.search.length > 1 ? 's' : ''} '${this.state.search.join(' ')}'` : ''}{this.state.cities ? ` in the selected cit${this.state.cities.length > 1 ? 'ies' : 'y'}: ${this.state.cities.join(', ')}` : ""}. {this.state.productNumberPerPage} Anzeigen pro Seite </Text>
+          <Text style={styles.contentTitle} > {this.state.categoryName} kategorisinde {this.state.totalProductNumber} ürün bulundu. Arama kelimeleri:  {this.state.search} </Text>
           <ScrollView style={styles.innerContent} ref="_innerContentScrollView" >
             {
               this.state.products.map((product, key) => {
                 return (
-                  <TouchableOpacity key={key} style={styles.eachProductWrapper} onPress={() => {this.eachProductOnPress(product._id)}} > 
+                  <TouchableOpacity key={key} style={styles.eachProductWrapper} onPress={() => {this.eachProductOnPress(product._id, product.owner)}} > 
                     <View style={styles.eachProductLeftSide} >
                       <Image source={{uri: product.productPhotoArray[0]}} style={styles.eachProductImage} ></Image>
                     </View>
@@ -248,11 +248,11 @@ export default class Index extends Component{
               <TouchableOpacity onPress={ () => {
                 this.changePageController(-1)
               }} >
-                <Text style={styles.backButton} > {'<'} Vorherig </Text>
+                <Text style={styles.backButton} > {'<'} Geri </Text>
               </TouchableOpacity>
               <Text style={styles.pageNumber} > {this.state.page + 1} / {Math.floor(this.state.totalProductNumber / this.state.productNumberPerPage) + 2} </Text>
               <TouchableOpacity onPress={()=>{ this.changePageController(1) }} >
-                <Text style={styles.nextButton} > Nächste {'>'} </Text>
+                <Text style={styles.nextButton} > İleri {'>'} </Text>
               </TouchableOpacity>              
             </View>
           </ScrollView>

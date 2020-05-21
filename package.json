@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "expo": "^34.0.1",
+    "expo-constants": "^9.0.0",
     "expo-image-manipulator": "~6.0.0",
     "expo-image-picker": "~6.0.0",
     "expo-linear-gradient": "~6.0.0",

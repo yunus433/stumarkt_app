@@ -12,12 +12,12 @@ export default class Login extends Component{
 
     this.state = {
       user: this.props.navigation.getParam('user', false),
-      message: 'Wir haben dir eine Bestätigungsmail geschickt! Bitte bestätige diese um deine Registration abzuschließen. Falls du keine Mail bekommen haben solltest, klicke den unteren link.'
+      message: 'Hesabın oluşturuldu! Hesabını aktive etmek için lütfen bize verdiğin e-posta adresine gelen linke tıkla. Eğer bir hata olursa bizden yeni bir e-posta isteyebilirsin!'
     };
   }
 
   newEmailButtonController = () => {
-    fetch(`https://www.stumarkt.com/api/verify?id=${this.state.user._id}`, {
+    fetch(`https://stumarkt.herokuapp.com/api/verify?id=${this.state.user._id}`, {
       headers: {
         "x_auth": API_KEY
       },
@@ -26,17 +26,17 @@ export default class Login extends Component{
     .then(data => {
       if (data.success) {
         this.setState({
-          "message": "Check your inbox. You have a mail from us!"
+          "message": "Gelen kutunu kontrol et, bizden bir mesajın var!"
         });
       } else {
         this.setState({
-          "message": "Ups, something went wrong!"
+          "message": "Bir hata oluştu."
         });
       }
     })
     .catch(err => {
       this.setState({
-        "message": "Ups, something went wrong!"
+        "message": "Bir hata oluştu."
       });
     })
   }
@@ -47,7 +47,7 @@ export default class Login extends Component{
         <View style={styles.innerWrapper} >
           <Text style={styles.verifyText} >{this.state.message}</Text>
           <TouchableOpacity style={styles.sendButton} onPress={() => {this.newEmailButtonController()}} >
-            <Text style={styles.sendButtonText} >Schick eine neue E-mail!</Text>
+            <Text style={styles.sendButtonText} >Yeni bir e-posta gönder!</Text>
           </TouchableOpacity>
         </View>
       </View>

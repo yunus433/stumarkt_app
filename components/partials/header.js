@@ -42,7 +42,7 @@ export default class Header extends Component {
             <Image source={require('./../../assets/search-button.png')} style={styles.searchButton} ></Image>
             <TextInput
               style={styles.searchInput}
-              placeholder="Was suchst du?"
+              placeholder="Ara"
               onChangeText={(search) => {this.setState({search: search})}}
               onSubmitEditing={() => {this.searchProductsWithKeywords()}}
             >
@@ -55,37 +55,37 @@ export default class Header extends Component {
         <View style={styles.headerCategoryWrapper} >
           <ScrollView horizontal={true} >
             <TouchableOpacity style={[styles.eachCategoryWrapper, {marginLeft: 0}]} onPress={() => {this.navigatePageController('all', 'Alle Kategorien')}} >
-              <Text style={styles.eachCategoryText} > Alle Kategorien </Text>
+              <Text style={styles.eachCategoryText} >Tüm Ürünler</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.eachCategoryWrapper} onPress={() => {this.navigatePageController('rented', 'Mietwohnung, Nachmiete')}} >
-              <Text style={styles.eachCategoryText} > Mietwohnung, Nachmiete </Text>
+              <Text style={styles.eachCategoryText} >Kiralık, Ev</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.eachCategoryWrapper} onPress={() => {this.navigatePageController('hobby', 'Freizeit, Hobby')}} >
-              <Text style={styles.eachCategoryText} > Freizeit, Hobby </Text>
+              <Text style={styles.eachCategoryText} >Eğlence, Hobi</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.eachCategoryWrapper} onPress={() => {this.navigatePageController('home', 'Hausmöbel')}} >
-              <Text style={styles.eachCategoryText} > Hausmöbel </Text>
+              <Text style={styles.eachCategoryText} >Ev Eşyası, Mobilya</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.eachCategoryWrapper} onPress={() => {this.navigatePageController('fashion', 'Mode, Kleidung')}} >
-              <Text style={styles.eachCategoryText} > Mode, Kleidung </Text>
+              <Text style={styles.eachCategoryText} >Moda, Giyim</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.eachCategoryWrapper} onPress={() => {this.navigatePageController('electronic', 'Elektronik')}} >
-              <Text style={styles.eachCategoryText} > Elektronik </Text>
+              <Text style={styles.eachCategoryText} >Elektronik</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.eachCategoryWrapper} onPress={() => {this.navigatePageController('fun', 'Musik, Filme, Bücher')}} >
-              <Text style={styles.eachCategoryText} > Musik, Filme, Bücher </Text>
+              <Text style={styles.eachCategoryText} >Müzik, Film, Kitap</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.eachCategoryWrapper} onPress={() => {this.navigatePageController('tickets', 'Eintrittskarten, Tickets')}} >
-              <Text style={styles.eachCategoryText} > Eintrittskarten, Tickets </Text>
+              <Text style={styles.eachCategoryText} >Bilet, Giriş Kartları</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.eachCategoryWrapper} onPress={() => {this.navigatePageController('exchange', 'Zu Verschenken, Tauschen')}} >
-              <Text style={styles.eachCategoryText} > Zu Verschenken, Tauschen </Text>
+              <Text style={styles.eachCategoryText} >Hediye, Takas</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.eachCategoryWrapper} onPress={() => {this.navigatePageController('lesson', 'Unterricht, Kurse')}} >
-              <Text style={styles.eachCategoryText} > Unterricht, Kurse </Text>
+              <Text style={styles.eachCategoryText} >Ders, Kurs</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.eachCategoryWrapper} onPress={() => {this.navigatePageController('other', 'Sonstige')}} >
-              <Text style={styles.eachCategoryText} > Sonstige </Text>
+              <Text style={styles.eachCategoryText} >Diğer</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>

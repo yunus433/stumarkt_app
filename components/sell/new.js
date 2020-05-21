@@ -52,7 +52,7 @@ export default class New extends Component{
 
   sendNewProductButton = () => {
     if (this.state.category && this.state.name && this.state.description && this.state.price && this.state.address1 && this.state.address2) {
-      fetch("https://www.stumarkt.com/api/newProduct", {
+      fetch("https://stumarkt.herokuapp.com/api/newProduct", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export default class New extends Component{
         return alert("Err: " + err);
       });
     } else {
-      return alert("Please fill all the necessary information before create a new product");
+      return alert("Lütfen gerekli tüm bilgileri girin.");
     }
   }
 
@@ -110,7 +110,7 @@ export default class New extends Component{
                 "type": `image/${manipulatedRes.uri.split('.').pop()}`
               });
       
-              fetch("https://www.stumarkt.com/api/newProductImage", {
+              fetch("https://stumarkt.herokuapp.com/api/newProductImage", {
                 method: "POST",
                 body: formData,
                 headers: {
@@ -125,7 +125,7 @@ export default class New extends Component{
                   return alert("Err: " + data.error);
       
                 if (!data || !data.fileName)
-                  return alert("Err: Unknown error occured, please try again");
+                  return alert("Err: Bir hata oluştu, lütfen tekrar deneyin.");
                   
                 this.setState(state => {
                   const productPhotoArray =  state.productPhotoArray.concat(manipulatedRes.uri);
@@ -166,7 +166,7 @@ export default class New extends Component{
             "type": `image/${manipulatedRes.uri.split('.').pop()}`
           });
   
-          fetch("https://www.stumarkt.com/api/newProductImage", {
+          fetch("https://stumarkt.herokuapp.com/api/newProductImage", {
             method: "POST",
             body: formData,
             headers: {
@@ -231,7 +231,7 @@ export default class New extends Component{
                   "type": `image/${manipulatedRes.uri.split('.').pop()}`
                 });
         
-                fetch("https://www.stumarkt.com/api/newProductImage", {
+                fetch("https://stumarkt.herokuapp.com/api/newProductImage", {
                   method: "POST",
                   body: formData,
                   headers: {
@@ -294,7 +294,7 @@ export default class New extends Component{
               "type": `image/${manipulatedRes.uri.split('.').pop()}`
             });
     
-            fetch("https://www.stumarkt.com/api/newProductImage", {
+            fetch("https://stumarkt.herokuapp.com/api/newProductImage", {
               method: "POST",
               body: formData,
               headers: {
@@ -359,7 +359,7 @@ export default class New extends Component{
                   "type": `image/${manipulatedRes.uri.split('.').pop()}`
                 });
         
-                fetch("https://www.stumarkt.com/api/newProductImage", {
+                fetch("https://stumarkt.herokuapp.com/api/newProductImage", {
                   method: "POST",
                   body: formData,
                   headers: {
@@ -422,7 +422,7 @@ export default class New extends Component{
               "type": `image/${manipulatedRes.uri.split('.').pop()}`
             });
     
-            fetch("https://www.stumarkt.com/api/newProductImage", {
+            fetch("https://stumarkt.herokuapp.com/api/newProductImage", {
               method: "POST",
               body: formData,
               headers: {
@@ -474,23 +474,23 @@ export default class New extends Component{
               <View style={styles.content} >
                 <ScrollView style={styles.innnerContent} >
                   <View style={styles.sellWrapper} >
-                    <Text style={styles.contentTitle} >Kategorie<Text style={styles.requiredItemSymbol} >* </Text> </Text>
+                    <Text style={styles.contentTitle} >Kategoriler:<Text style={styles.requiredItemSymbol} >* </Text> </Text>
                     <View style={styles.categoryWrapper} > 
                       <TouchableOpacity onPress={() => this.categoryInput("rented")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.category == "rented" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Mietwohnung, Nachmiete</Text>
+                        <Text style={styles.eachCategoryText} >Kiralık, Ev</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.categoryInput("hobby")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.category == "hobby" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Freizeit, Hobby</Text>
+                        <Text style={styles.eachCategoryText} >Eğlence, Hobi</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.categoryInput("home")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.category == "home" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Hausmöbel</Text>
+                        <Text style={styles.eachCategoryText} >Ev Eşyası, Mobilya</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.categoryInput("fashion")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.category == "fashion" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Mode, Kleidung</Text>
+                        <Text style={styles.eachCategoryText} >Moda, Giyim</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.categoryInput("electronic")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.category == "electronic" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
@@ -498,38 +498,38 @@ export default class New extends Component{
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.categoryInput("fun")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.category == "fun" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Musik, Filme, Bücher</Text>
+                        <Text style={styles.eachCategoryText} >Müzik, Film, Kitap</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.categoryInput("tickets")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.category == "tickets" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Eintrittskarten, Tickets</Text>
+                        <Text style={styles.eachCategoryText} >Bilet, Giriş Kartları</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.categoryInput("exchange")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.category == "exchange" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Zu Verschenken, Tauschen</Text>
+                        <Text style={styles.eachCategoryText} >Hediye, Takas</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.categoryInput("lesson")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.category == "lesson" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Unterricht, Kurse</Text>
+                        <Text style={styles.eachCategoryText} >Ders, Kurs</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.categoryInput("other")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.category == "other" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Sonstige</Text>
+                        <Text style={styles.eachCategoryText} >Diğer</Text>
                       </TouchableOpacity>
                     </View>
-                    <Text style={styles.contentTitle} >Anzeigendetails <Text style={styles.requiredItemSymbol} >* </Text> </Text>
+                    <Text style={styles.contentTitle} >Ürün Detayları<Text style={styles.requiredItemSymbol} >* </Text> </Text>
                     <TextInput 
-                      placeholder="Titel" 
+                      placeholder="Ürün İsmi" 
                       onChangeText={(name) => { this.setState({name: name})}} 
                       style={styles.nameInput} >
                     </TextInput>
                     <TextInput 
-                      placeholder="Beschreibung" 
+                      placeholder="Ürün Detayları" 
                       onChangeText={(description) => { this.setState({description: description})}}
                       style={styles.descriptionInput} 
                       multiline={true} >
                     </TextInput>
-                    <Text style={styles.contentTitle} >Bilder</Text>
+                    <Text style={styles.contentTitle} >Fotoğrafları</Text>
                     <View style={styles.imagesWrapper} >
                       <ScrollView horizontal={true} >
                         { this.state.productPhotoArray.map((photo, key) => {
@@ -548,7 +548,7 @@ export default class New extends Component{
                         }
                       </ScrollView>
                     </View>
-                    <Text style={styles.contentTitle} >Preis<Text style={styles.requiredItemSymbol} >* </Text> </Text>
+                    <Text style={styles.contentTitle} >Fiyat<Text style={styles.requiredItemSymbol} >* </Text> </Text>
                     <View style={styles.priceWrapper} >
                       <TouchableOpacity onPress={() => this.priceInput(this.state.otherPrice)} style={styles.eachCategoryWrapper} >
                           <View style={ this.state.price != "free" && this.state.otherPrice ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
@@ -561,41 +561,41 @@ export default class New extends Component{
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.priceInput("free")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.price == "free" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} > Zu Verschenken </Text>
+                        <Text style={styles.eachCategoryText} >Hediye Et (ücretsiz)</Text>
                       </TouchableOpacity>
                     </View>
-                    <Text style={styles.contentTitle} >Ort</Text>
+                    <Text style={styles.contentTitle} >Adres</Text>
                     <View style={styles.addressLine} >
                       <TextInput
-                        placeholder="PLZ" 
+                        placeholder="İlçe" 
                         onChangeText={(address1) => { this.setState({address1: address1})}}
                         style={styles.addressInputOne} >
                       </TextInput>
                       <Text style={styles.requiredItemSymbol} >* </Text>
                       <TextInput
-                        placeholder="Ort" 
+                        placeholder="Şehir" 
                         onChangeText={(address2) => { this.setState({address2: address2})}}
                         style={styles.addressInputTwo} >
                       </TextInput>
                       <Text style={styles.requiredItemSymbol} >* </Text>
                     </View>
                     <TextInput
-                        placeholder="Straße/Nummer (freiwillige Eingabe)" 
+                        placeholder="Posta Kodu" 
                         onChangeText={(address3) => { this.setState({address3: address3})}}
                         style={styles.addressInputThree} >
                     </TextInput>
-                    <Text style={styles.contentTitle} >Veröffentliche deine Anzeige<Text style={styles.requiredItemSymbol} >* </Text> </Text>
+                    <Text style={styles.contentTitle} >Gizlilik Antlaşmaları:<Text style={styles.requiredItemSymbol} >* </Text> </Text>
                     <View style={styles.agreementWrapper} >
-                      <Text style={styles.agreementText} >Ich bin mit den Folgenden einverstanden: </Text>
+                      <Text style={styles.agreementText} >Bu ürünü oluşturarak aşağıdaki antlaşmaları kabul etmiş olursun: </Text>
                       <TouchableOpacity>
-                        <Text style={styles.agreementLink} >Nutzungsbedingungen</Text>
+                        <Text style={styles.agreementLink} >Hizmet Koşulları</Text>
                       </TouchableOpacity>
                       <TouchableOpacity>
-                        <Text style={styles.agreementLink} >Datenschutzerklärung</Text>
+                        <Text style={styles.agreementLink} >Gizlilik Sözleşmesi</Text>
                       </TouchableOpacity>
                     </View>
                     <TouchableOpacity style={styles.sendButton} onPress={() => {this.sendNewProductButton()}} >
-                      <Text style={styles.sendButtonText} >Anzeige Aufgeben</Text>
+                      <Text style={styles.sendButtonText} >Düzenle</Text>
                     </ TouchableOpacity>
                   </View>
                 </ScrollView>
@@ -606,13 +606,13 @@ export default class New extends Component{
           <View style={{flex: 1, justifyContent: "center", alignItems: "center"}} >
             <ActivityIndicator size="large" color="rgb(255, 67, 148)" />
             <View style={styles.photoOptionsWrapper} >
-              <Text style={styles.optionsTitle} >Foto hochladen</Text>
+              <Text style={styles.optionsTitle} >Fotoğraf Yükle</Text>
               <View style={styles.buttonWrapper} >
                 <TouchableOpacity style={[styles.optionButtons, {marginRight: 5}]} onPress={() => {this.optionButtonController("library")}} >
-                  <Text style={styles.optionButtonsText} >Foto auswählen</Text>
+                  <Text style={styles.optionButtonsText} >Fotoğraflarından Seç</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.optionButtons, {marginLeft: 5}]} onPress={() => {this.optionButtonController("camera")}}>
-                  <Text style={styles.optionButtonsText} >Foto aufnehmen</Text>
+                  <Text style={styles.optionButtonsText} >Fotoğraf Çek</Text>
                 </TouchableOpacity>
               </View>
             </View>

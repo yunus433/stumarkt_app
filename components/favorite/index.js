@@ -22,7 +22,7 @@ export default class Index extends Component{
     if (!this.state.user.favorites.length)
       return ;
 
-    fetch(`https://www.stumarkt.com/api/products?userFavorites=${this.state.user.favorites.join(',')}`, {
+    fetch(`https://stumarkt.herokuapp.com/api/products?userFavorites=${this.state.user.favorites.join(',')}`, {
       headers: {
         "x_auth": API_KEY
       }
@@ -40,7 +40,7 @@ export default class Index extends Component{
   }
 
   addToFavorites = (id) => {
-    fetch(`https://www.stumarkt.com/api/addToFavorite?id=${this.state.user._id}`, {
+    fetch(`https://stumarkt.herokuapp.com/api/addToFavorite?id=${this.state.user._id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -77,7 +77,7 @@ export default class Index extends Component{
         <Header navigation={this.props.navigation} ></Header>
         <View style={styles.content} >
           <ScrollView style={styles.innerContent} ref="_innerContentScrollView" >
-            <Text style={styles.contentTitle} >Favoriten</Text>
+            <Text style={styles.contentTitle} >Favoriler</Text>
             {
               this.state.products.length ?
               this.state.products.map((product, key) => {
@@ -104,7 +104,7 @@ export default class Index extends Component{
                 );
               })
               :
-              <Text style={styles.contentInfo} >Es gibt keine Favorites.</Text>
+              <Text style={styles.contentInfo} >Hiçbir ürün seçilmedi.</Text>
             }
             <View style={{height: 60}} ></View>
           </ScrollView>

@@ -9,7 +9,7 @@
       "android",
       "web"
     ],
-    "version": "2.1.0",
+    "version": "2.1.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -33,7 +33,7 @@
     },
     "android": {
       "package": "com.stumarkt.co",
-      "versionCode": 4
+      "versionCode": 5
     }
   }
 }

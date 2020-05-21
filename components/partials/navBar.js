@@ -11,7 +11,7 @@ export default class NavBar extends Component{
   };
 
   navigateController = (page) => {
-    fetch("https://www.stumarkt.com/api/users?id=" + this.state.user._id, {
+    fetch("https://stumarkt.herokuapp.com/api/users?id=" + this.state.user._id, {
         headers: {
           "x_auth": API_KEY
         }

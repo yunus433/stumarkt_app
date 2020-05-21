@@ -148,8 +148,8 @@ export default class Category extends Component{
         <Header navigation={this.props.navigation}></Header>
         <View style={styles.content} >
           <View style={{padding: 20, flex: 1}} >
-            <Text style={styles.contentTitle} >Filter nach Stadt</Text>
-            <Text style={styles.contentInfo} >Wähle die Stadt aus, die du filtern möchtest.</Text>
+            <Text style={styles.contentTitle} >Şehre göre Filtrele</Text>
+            <Text style={styles.contentInfo} >Filtrelemek istediğiniz şehri seçin.</Text>
             <View style={styles.universityWrapper} >
               <ScrollView>
                 <TouchableOpacity onPress={() => {this.addCityToList("Aachen")}} style={this.state.selectedCities.includes("Aachen") ? styles.eachUniActive : styles.eachUni} >
@@ -395,11 +395,11 @@ export default class Category extends Component{
               </ScrollView>
             </View>
             <ScrollView style={{marginBottom: 10}}>
-              <Text style={styles.selectedUniNamesTitle} >Ausgewählte Städte: </Text>
-              <Text style={styles.selectedUniNames} >{this.state.selectedCities.length ? this.state.selectedCities.join(", ") : "Keine Stadt ist ausgewählt"}</Text>
+              <Text style={styles.selectedUniNamesTitle} >Seçilen Şehirler: </Text>
+              <Text style={styles.selectedUniNames} >{this.state.selectedCities.length ? this.state.selectedCities.join(", ") : "Hiçbir şehir seçilmedi."}</Text>
             </ScrollView>
             <TouchableOpacity style={styles.applyFiltersButton} onPress={() => {this.applyFilter()}} >
-              <Text  style={styles.applyFiltersButtonText} >Filtern</Text>
+              <Text  style={styles.applyFiltersButtonText} >Filtrele</Text>
             </TouchableOpacity>
           </View>
         </View>

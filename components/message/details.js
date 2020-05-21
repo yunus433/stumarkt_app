@@ -38,7 +38,7 @@ export default class MessageDetails extends Component{
   };
 
   componentWillMount () {
-    fetch('https://www.stumarkt.com/api/messages?buyer=' + this.state.buyer._id + '&product=' + this.state.product._id + '&sendedBy=' + (this.state.messagesOf == 'buyer' ? 'owner' : 'buyer') + '&user=' + this.state.user._id, {
+    fetch('https://stumarkt.herokuapp.com/api/messages?buyer=' + this.state.buyer._id + '&product=' + this.state.product._id + '&sendedBy=' + (this.state.messagesOf == 'buyer' ? 'owner' : 'buyer') + '&user=' + this.state.user._id, {
       headers: {
         "x_auth": API_KEY
       }
@@ -97,7 +97,7 @@ export default class MessageDetails extends Component{
   };
 
   componentDidMount() {
-    const socket = socketIO('https://www.stumarkt.com');
+    const socket = socketIO('https://stumarkt.herokuapp.com');
     
     socket.connect();
 

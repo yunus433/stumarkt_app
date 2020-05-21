@@ -16,10 +16,11 @@ export default class Index extends Component{
   constructor (props) {
     super(props);
     this.state = {
-      uploadStatus: "Profilbild bearbeiten",
+      uploadStatus: "Fotoğraf yüklemek için tıklayın.",
       user: this.props.navigation.getParam('user', false),
       name: this.props.navigation.getParam('user', false).name,
       email: this.props.navigation.getParam('user', false).email,
+      school: this.props.navigation.getParam('user', false).university,
       password: "",
       confirmPassword: "",
       error: "",
@@ -53,7 +54,7 @@ export default class Index extends Component{
                 "type": `image/${manipulatedRes.uri.split('.').pop()}`
               });
       
-              fetch("https://www.stumarkt.com/api/editUserProfile?id=" + this.state.user._id, {
+              fetch("https://stumarkt.herokuapp.com/api/editUserProfile?id=" + this.state.user._id, {
                 method: "POST",
                 body: formData,
                 headers: {
@@ -93,7 +94,7 @@ export default class Index extends Component{
           { compress: 0.4 }
         )
         .then(manipulatedRes => {
-          this.setState({"uploadStatus": "uploading..."});
+          this.setState({"uploadStatus": "yükleniyor..."});
           const formData = new FormData();
           formData.append('photo', {
             "uri": manipulatedRes.uri,
@@ -101,7 +102,7 @@ export default class Index extends Component{
             "type": `image/${manipulatedRes.uri.split('.').pop()}`
           });
   
-          fetch("https://www.stumarkt.com/api/editUserProfile?id=" + this.state.user._id, {
+          fetch("https://stumarkt.herokuapp.com/api/editUserProfile?id=" + this.state.user._id, {
             method: "POST",
             body: formData,
             headers: {
@@ -114,10 +115,10 @@ export default class Index extends Component{
           .then(data => {
             if (data && data.error)
               return alert("Err: " + data.error);
-  
+
             const newUser = this.state.user;
             newUser.profilePhoto = data.image;
-            this.setState({"user": newUser, "uploadStatus": "Profilbild bearbeiten"});
+            this.setState({"user": newUser, "uploadStatus": "Yüklemek için tıklayın."});
           })
           .catch(err => {
             return alert("Err: " + err);
@@ -132,7 +133,7 @@ export default class Index extends Component{
 
   sendMainButtonController = () => {
     if (!this.state.name || !this.state.email) {
-      this.setState({"error": "Please write all the necessary information"});
+      this.setState({"error": "Lütfen tüm bilgileri yazın"});
     } else {
       if (this.state.password.length) {
         if (this.state.password != this.state.confirmPassword) {
@@ -140,7 +141,7 @@ export default class Index extends Component{
         } else if (this.state.password.length < 6) {
           this.setState({"error": "Dein Passwort muss mindestens 6-stellig sein!"});
         } else {
-          fetch(`https://www.stumarkt.com/api/editUser?id=${this.state.user._id}`, {
+          fetch(`https://stumarkt.herokuapp.com/api/editUser?id=${this.state.user._id}`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -171,7 +172,7 @@ export default class Index extends Component{
             });
         }
       } else {
-        fetch(`https://www.stumarkt.com/api/editUser?id=${this.state.user._id}`, {
+        fetch(`https://stumarkt.herokuapp.com/api/editUser?id=${this.state.user._id}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -180,17 +181,17 @@ export default class Index extends Component{
           body: JSON.stringify({
             "name": this.state.name,
             "email": this.state.email,
-            "university": this.state.university
+            "university": this.state.school
           })
         })
           .then(response => {return response.json()})
           .then(data => {
             if (data.error && data.error == 'email already taken')
-              return this.setState({"error": "Diese E-mail ist bereits registriert"});
+              return this.setState({"error": "Bu e-posta adresi zaten alınmış."});
             if (data.error && data.error == 'not valid email')
-              return this.setState({"error": "Diese E-mail ist nicht verfügbar"});
+              return this.setState({"error": "Lütfen geçerli bir e-posta adresi girin"});
             if (data.error) return alert("Err: " + data.error);
-            if (!data.user) return alert("Err: An unknown erro occured, please try again.");
+            if (!data.user) return alert("Err: Bilinmeyen bir hata oluştu.");
 
             this.props.navigation.push('editDashboard', {
               "user": data.user
@@ -209,100 +210,61 @@ export default class Index extends Component{
         <Header navigation={this.props.navigation} ></Header>
         <View style={styles.content} >
           <ScrollView style={{flex: 1, width: "100%"}} contentContainerStyle={{flexGrow: 1}} ref="scrollView" >
-            { !this.state.onUniversity ?
-              <View style={styles.formWrapper}>
-                <View style={styles.header} >
-                  <Text style={styles.title} >
-                    Einstellungen
-                  </Text>
-                </View>
-                <TouchableOpacity style={styles.userImageWrapper} onPress={() => {this.changeUserImageButton()}} >
-                  <Image style={styles.userImage} source={{uri: this.state.user.profilePhoto}} ></Image>
-                  <Text style={styles.userText} >{this.state.uploadStatus}</Text>
-                </TouchableOpacity>
-                <Text style={styles.inputTitle} >Name:</Text>
-                <TextInput 
-                  style={styles.formInput}
-                  placeholder="Name"
-                  onChangeText={(name) => { this.setState({name: name})}}
-                  value={this.state.name}
-                >
-                </TextInput>
-                <Text style={styles.inputTitle} >Email:</Text>
-                <TextInput 
-                  style={styles.formInput}
-                  placeholder="Email"
-                  onChangeText={(email) => {this.setState({email: email})}}
-                  value={this.state.email}
-                >
-                </TextInput>
-                <Text style={styles.inputTitle} >Neues Passwort (min. 6-stelling):</Text>
-                <TextInput 
-                  secureTextEntry={true}
-                  style={styles.formInput}
-                  placeholder="Passwort"
-                  onChangeText={(password) => {this.setState({password: password})}}
-                >
-                </TextInput>
-                <Text style={styles.inputTitle} >Neues Passwort wiederholen:</Text>
-                <TextInput 
-                  secureTextEntry={true}
-                  style={styles.formInput}
-                  placeholder="Passwort Wiederholen"
-                  onChangeText={(confirmPassword) => {this.setState({confirmPassword: confirmPassword})}}
-                >
-                </TextInput>
-                <TouchableOpacity>
-                  <Text></Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.sendButton} onPress={() => {this.sendMainButtonController()}} >
-                  <Text style={styles.sendButtonText} > Einstellungen </Text>
-                </ TouchableOpacity>
-                <View style={styles.errorLineWrapper} >
-                  <Text style={styles.errorLine} >{this.state.error}</Text>
-                </View>
+            <View style={styles.formWrapper}>
+              <View style={styles.header} >
+                <Text style={styles.title} >
+                  Ayarlar
+                </Text>
               </View>
-              :
-              <View style={styles.formWrapper} >
-                <View style={styles.header} >
-                  <Text style={styles.title} >
-                    Select University
-                  </Text>
-                </View>
-                <View style={styles.universitySearchWrapper} >
-                <Image source={require('./../../assets/search-icon.png')} style={styles.universitySearchLogo} ></Image>
-                  <TextInput style={styles.universitySearchInput} placeholder="Search" onChangeText={(text) => {this.searchUniversityController(text)}} ></TextInput>
-                </View>
-                <ScrollView style={styles.universityWrapper} >
-                  { this.state.universityList.length ?
-                    this.state.universityList.map((uni, key) => {
-                      return (
-                        <TouchableOpacity key={key} style={ this.state.university == uni ? styles.activeUniversityButton : styles.eachUniversityButton} onPress={() => {this.setState({"university": uni})}} >
-                          <Text style={styles.eachUniversityText} >{uni}</Text>
-                        </TouchableOpacity>
-                      )
-                    })
-                    :
-                    <Text style={styles.uniNoResult} >No result</Text>
-                  }
-                </ScrollView>
-                <View style={styles.agreementWrapper} >
-                  <Text style={styles.agreementText} >Ich bin mit den Folgenden einverstanden: </Text>
-                  <TouchableOpacity>
-                    <Text style={styles.agreementLink} >Nutzungsbedingungen</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Text style={styles.agreementLink} >Datenschutzerklärung</Text>
-                  </TouchableOpacity>
-                </View>
-                <TouchableOpacity style={styles.sendButton} onPress={() => {this.registerButtonController()}} >
-                  <Text style={styles.sendButtonText} > Registrieren </Text>
-                </ TouchableOpacity>
-                <View style={styles.errorLineWrapper} >
-                  <Text style={styles.errorLine} >{this.state.error}</Text>
-                </View>
+              <TouchableOpacity style={styles.userImageWrapper} onPress={() => {this.changeUserImageButton()}} >
+                <Image style={styles.userImage} source={{uri: this.state.user.profilePhoto}} ></Image>
+                <Text style={styles.userText} >{this.state.uploadStatus}</Text>
+              </TouchableOpacity>
+              <Text style={styles.inputTitle} >Ad Soyad:</Text>
+              <TextInput 
+                style={styles.formInput}
+                placeholder="Ad Soyad"
+                onChangeText={(name) => { this.setState({name: name})}}
+                value={this.state.name}
+              >
+              </TextInput>
+              <Text style={styles.inputTitle} >E-Posta:</Text>
+              <TextInput 
+                style={styles.formInput}
+                placeholder="E-Posta"
+                onChangeText={(email) => {this.setState({email: email})}}
+                value={this.state.email}
+              >
+              </TextInput>
+              <Text style={styles.inputTitle} >Yeni Şifre (en az 6 haneli):</Text>
+              <TextInput 
+                secureTextEntry={true}
+                style={styles.formInput}
+                placeholder="Şifre"
+                onChangeText={(password) => {this.setState({password: password})}}
+              >
+              </TextInput>
+              <Text style={styles.inputTitle} >Şifre Tekrarı:</Text>
+              <TextInput 
+                secureTextEntry={true}
+                style={styles.formInput}
+                placeholder="Şifre Tekrarı"
+                onChangeText={(confirmPassword) => {this.setState({confirmPassword: confirmPassword})}}
+              >
+              </TextInput>
+              <TextInput
+                style={styles.formInput}
+                placeholder="Okul"
+                onChangeText={(school) => {this.setState({school: school})}}
+              >
+              </TextInput>
+              <TouchableOpacity style={styles.sendButton} onPress={() => {this.sendMainButtonController()}} >
+                <Text style={styles.sendButtonText} >Tamam</Text>
+              </ TouchableOpacity>
+              <View style={styles.errorLineWrapper} >
+                <Text style={styles.errorLine} >{this.state.error}</Text>
               </View>
-            }
+            </View>
           </ScrollView>
         </View>
         <NavBar navigation={this.props.navigation} pageName="user" ></NavBar>

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { AppRegistry, Keyboard, TouchableWithoutFeedback, Text, View, StyleSheet, TextInput, Image, ScrollView, TouchableOpacity} from 'react-native';
+import Constants from 'expo-constants';
 import { API_KEY } from 'react-native-dotenv'
 
 export default class Register extends Component {
@@ -258,175 +259,110 @@ export default class Register extends Component {
 
   nextButtonController = () => {
     Keyboard.dismiss()
-    if (this.state.name && this.state.email && this.state.password && this.state.passwordConfirm) {
+    
+  }
+
+  registerButtonController = () => {
+    Keyboard.dismiss();
+    if (this.state.name && this.state.email && this.state.password && this.state.passwordConfirm && this.state.university) {
       if (this.state.password.length >= 6) {
         if (this.state.password == this.state.passwordConfirm) {
-          this.setState({
-            "onUniversity": true,
-            "error": ""
+          fetch(`https://stumarkt.herokuapp.com/api/register?email=${this.state.email}&name=${this.state.name}&password=${this.state.password}&university=${this.state.university}` , {
+            headers: {
+              "x_auth": API_KEY
+            }
+          })
+          .then(response => {return response.json()})
+          .then(data => {
+            if (data.error && data.error == 'Email is not valid') {
+              this.setState({
+                "onUniversity": false,
+                "error": "Lütfen geçerli bir e-posta adresi girin."
+              })
+            } else if (data.error && data.error == 'Email is taken') {
+              this.setState({
+                "onUniversity": false,
+                "error": "Bu e-posta adresi zaten kullanılmış."
+              })
+            } else if (data.error) {
+              alert("Err: " + data.error);
+            } else {
+              this.props.navigation.push('main', {"user": data.user});
+            }
+          })
+          .catch(err => {
+            alert("Err: " + err);u
           });
         } else {
           this.setState({
-            "error": "Bitte bestätige dein Passwort!"
+            "error": "Lütfen şifrenizi onaylayın."
           });
         }
       } else {
         this.setState({
-          "error": "Dein Passwort muss mindestens 6-stellig sein!"
+          "error": "Şifreniz en az 6 karakter uzunluğunda olmalıdır."
         });
       }
     } else {
       this.setState({
-        "error": "Please write all the necessary information"
+        "error": "Lütfen tüm bilgileri girin."
       });
     }
-  }
-
-  registerButtonController = () => {
-    Keyboard.dismiss()
-    if (this.state.university.length) {
-      fetch(`https://www.stumarkt.com/api/register?email=${this.state.email}&name=${this.state.name}&password=${this.state.password}&university=${this.state.university}` , {
-        headers: {
-          "x_auth": API_KEY
-        }
-      })
-      .then(response => {return response.json()})
-      .then(data => {
-        if (data.error && data.error == 'Email is not valid') {
-          this.setState({
-            "onUniversity": false,
-            "error": "Diese E-mail ist nicht verfügbar"
-          })
-        } else if (data.error && data.error == 'Email is taken') {
-          this.setState({
-            "onUniversity": false,
-            "error": "Diese E-mail ist bereits registriert"
-          })
-        } else if (data.error) {
-          alert("Err: " + data.error);
-        } else {
-          this.props.navigation.push('main', {"user": data.user});
-        }
-      })
-      .catch(err => {
-        alert("Err: " + err);u
-      })
-    } else {
-      this.setState({
-        "error": "Please select a university"
-      });
-    }
-  }
-
-  searchUniversityController = (text) => {
-    this.setState((state) => {
-      if (text.length > 0) {
-        const uniArray = state.originalUniversityList.filter(uni => {
-          return uni.toLowerCase().indexOf(text.trim().toLowerCase()) !== -1
-        });
-  
-        return {
-          "universityList": uniArray
-        };
-      } else {
-        return {
-          "universityList": state.originalUniversityList
-        };
-      }
-    });
   }
 
   render() {
     return (
       <TouchableWithoutFeedback style={styles.mainWrapper} onPress={() => {Keyboard.dismiss()}}>
         <View style={styles.innerWrapper} >
-          { !this.state.onUniversity ?
-            <View style={styles.formWrapper}>
-              <View style={styles.header} >
-                <Text style={styles.title} >
-                  Registrieren
-                </Text>
-              </View>
-              <TextInput 
-                style={styles.formInput}
-                placeholder="Name"
-                onChangeText={(name) => { this.setState({name: name})}}
-              >
-              </TextInput>
-              <TextInput 
-                style={styles.formInput}
-                placeholder="Email"
-                onChangeText={(email) => {this.setState({email: email})}}
-              >
-              </TextInput>
-              <TextInput
-                secureTextEntry={true}
-                style={styles.formInput}
-                placeholder="Passwort"
-                onChangeText={(password) => {this.setState({password: password})}}
-              >
-              </TextInput>
-              <TextInput
-                secureTextEntry={true}
-                style={styles.formInput}
-                placeholder="Passwort wiederholen"
-                onChangeText={(password) => {this.setState({passwordConfirm: password})}}
-              >
-              </TextInput>
-              <TouchableOpacity style={styles.sendButton} onPress={() => {this.nextButtonController()}} >
-                <Text style={styles.sendButtonText} > Next </Text>
-              </ TouchableOpacity>
-              <View style={styles.errorLineWrapper} >
-                <Text style={styles.errorLine} >{this.state.error}</Text>
-              </View>
+          <View style={styles.formWrapper}>
+            <View style={styles.header} >
+              <Text style={styles.title} >Üye ol</Text>
             </View>
-            :
-            <View style={styles.formWrapper} >
-              <View style={styles.header} >
-                <Text style={styles.title} >
-                  Select University
-                </Text>
-              </View>
-              <View style={styles.universitySearchWrapper} >
-              <Image source={require('./../../assets/search-icon.png')} style={styles.universitySearchLogo} ></Image>
-                <TextInput style={styles.universitySearchInput} placeholder="Suche" onChangeText={(text) => {this.searchUniversityController(text)}} ></TextInput>
-              </View>
-              <ScrollView style={styles.universityWrapper} >
-                { this.state.universityList.length ?
-                  this.state.universityList.map((uni, key) => {
-                    return (
-                      <TouchableOpacity key={key} style={ this.state.university == uni ? styles.activeUniversityButton : styles.eachUniversityButton} onPress={() => {this.setState({"university": uni})}} >
-                        <Text style={styles.eachUniversityText} >{uni}</Text>
-                      </TouchableOpacity>
-                    )
-                  })
-                  :
-                  <Text style={styles.uniNoResult} >No result</Text>
-                }
-              </ScrollView>
-              <View style={styles.agreementWrapper} >
-                <Text style={styles.agreementText} >Ich bin mit den Folgenden einverstanden: </Text>
-                <TouchableOpacity>
-                  <Text style={styles.agreementLink} >Nutzungsbedingungen</Text>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <Text style={styles.agreementLink} >Datenschutzerklärung</Text>
-                </TouchableOpacity>
-              </View>
-              <TouchableOpacity style={styles.sendButton} onPress={() => {this.registerButtonController()}} >
-                <Text style={styles.sendButtonText} > Registrieren </Text>
-              </ TouchableOpacity>
-              <View style={styles.errorLineWrapper} >
-                <Text style={styles.errorLine} >{this.state.error}</Text>
-              </View>
+            <TextInput 
+              style={styles.formInput}
+              placeholder="Ad Soyad"
+              onChangeText={(name) => { this.setState({name: name})}}
+            >
+            </TextInput>
+            <TextInput 
+              style={styles.formInput}
+              placeholder="E-posta"
+              onChangeText={(email) => {this.setState({email: email})}}
+            >
+            </TextInput>
+            <TextInput 
+              style={styles.formInput}
+              placeholder="Okul"
+              onChangeText={(university) => {this.setState({university: university})}}
+            >
+            </TextInput>
+            <TextInput
+              secureTextEntry={true}
+              style={styles.formInput}
+              placeholder="Şifre (en az 6 haneli)"
+              onChangeText={(password) => {this.setState({password: password})}}
+            >
+            </TextInput>
+            <TextInput
+              secureTextEntry={true}
+              style={styles.formInput}
+              placeholder="Şifre tekrarı"
+              onChangeText={(password) => {this.setState({passwordConfirm: password})}}
+            >
+            </TextInput>
+            <TouchableOpacity style={styles.sendButton} onPress={() => {this.registerButtonController()}} >
+              <Text style={styles.sendButtonText} >Üye Ol</Text>
+            </ TouchableOpacity>
+            <View style={styles.errorLineWrapper} >
+              <Text style={styles.errorLine} >{this.state.error}</Text>
             </View>
-          }
+          </View>
           <View style={styles.bottomLink} >
-            <Text style={styles.bottomLinkInfo} > Schon registriert? </Text>
+            <Text style={styles.bottomLinkInfo} >Zaten üye misin?</Text>
             <TouchableOpacity
               onPress={() => {this.props.navigation.navigate('login')}} 
             >
-              <Text style={styles.bottomLinkButton} > Einloggen </Text>
+              <Text style={styles.bottomLinkButton} >Giriş Yap</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -437,14 +373,14 @@ export default class Register extends Component {
 
 const styles = StyleSheet.create({
   mainWrapper: {
-    flex: 1,
-    justifyContent: "center", alignItems: "center",
+    flex: 1, justifyContent: "center",
     backgroundColor: "rgb(248, 248, 248)",
+    paddingTop: Constants.statusBarHeight,
     padding: 25
   },
   innerWrapper: {
     flex: 1,
-    margin: 25, marginTop: "50%"
+    margin: 25, marginTop: 150
   },
   formWrapper: {
     backgroundColor: "white",
@@ -465,38 +401,6 @@ const styles = StyleSheet.create({
     borderColor: "rgb(236, 236, 235)", borderWidth: 2, borderRadius: 5,
     color: "rgb(112, 112, 122)", fontSize: 16,
     marginBottom: 15
-  },
-  universityWrapper: {
-    height: 200,
-    marginBottom: 15, paddingBottom: 20, paddingLeft: 10, paddingRight: 10
-  },
-  universitySearchWrapper: {
-    flexDirection: "row", alignItems: "center",
-    marginBottom: 15
-  },
-  universitySearchInput: {
-    color: "rgb(112, 112, 112)", fontSize: 16
-  },
-  universitySearchLogo: {
-    height: 15, width: 15, resizeMode: "contain",
-    marginRight: 5
-  },
-  uniNoResult: {
-    color: "rgb(112, 112, 112)", fontSize: 15, fontWeight: "300", textAlign: "center",
-    marginTop: 25
-  },
-  eachUniversityButton: {
-    backgroundColor: "rgb(248, 248, 248)",
-    padding: 10, marginBottom: 10,
-    borderColor: "rgb(236, 235, 235)", borderWidth: 2, borderRadius: 5
-  },
-  activeUniversityButton: {
-    backgroundColor: "rgb(248, 248, 248)",
-    padding: 10, marginBottom: 10,
-    borderColor: "rgb(255, 61, 148)", borderWidth: 2, borderRadius: 5
-  },
-  eachUniversityText:{
-    color: "rgb(112, 112, 112)", fontSize: 14, fontWeight: "600", textAlign: "center"
   },
   agreementWrapper: {
     marginBottom: 20

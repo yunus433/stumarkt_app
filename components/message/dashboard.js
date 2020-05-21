@@ -21,7 +21,7 @@ export default class MessageDetails extends Component{
   };
 
   getAllMessages = () => {
-    fetch(`https://www.stumarkt.com/api/messages?buyer=${this.state.user._id}`, {
+    fetch(`https://stumarkt.herokuapp.com/api/messages?buyer=${this.state.user._id}`, {
       headers: {
         "x_auth": API_KEY
       }
@@ -39,7 +39,7 @@ export default class MessageDetails extends Component{
       alert("Error: " + err)
     });
 
-    fetch(`https://www.stumarkt.com/api/messages?owner=${this.state.user._id}`, {
+    fetch(`https://stumarkt.herokuapp.com/api/messages?owner=${this.state.user._id}`, {
       headers: {
         "x_auth": API_KEY
       }
@@ -60,7 +60,7 @@ export default class MessageDetails extends Component{
 
   messageDetailsButtonController = (messagesOf, buyerId, productId) => {
     if (messagesOf == "buyer") {
-      fetch(`https://www.stumarkt.com/api/products?id=${productId}`, {
+      fetch(`https://stumarkt.herokuapp.com/api/products?id=${productId}`, {
         headers: {
           "x_auth": API_KEY
         }
@@ -69,7 +69,7 @@ export default class MessageDetails extends Component{
         .then(data => {
           if (data.error) return alert("Err: " + data.error);
 
-          fetch('https://www.stumarkt.com/api/users?id=' + data.product.owner, {
+          fetch('https://stumarkt.herokuapp.com/api/users?id=' + data.product.owner, {
             headers: {
               "x_auth": API_KEY
             }
@@ -94,7 +94,7 @@ export default class MessageDetails extends Component{
           return alert("Err: " + err);
         })
     } else if (messagesOf == "owner") {
-      fetch(`https://www.stumarkt.com/api/products?id=${productId}`, {
+      fetch(`https://stumarkt.herokuapp.com/api/products?id=${productId}`, {
         headers: {
           "x_auth": API_KEY
         }
@@ -103,7 +103,7 @@ export default class MessageDetails extends Component{
         .then(data => {
           if (data.error) return alert("Err: " + data.error);
 
-          fetch('https://www.stumarkt.com/api/users?id=' + buyerId, {
+          fetch('https://stumarkt.herokuapp.com/api/users?id=' + buyerId, {
             headers: {
               "x_auth": API_KEY
             }

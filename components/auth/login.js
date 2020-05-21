@@ -30,7 +30,7 @@ export default class Login extends Component{
   onLoginPageSend() {
     Keyboard.dismiss();
     if (this.state.email != '' && this.state.password != '' ) {
-      fetch("https://www.stumarkt.com/api/login?email=" + this.state.email + "&password=" + this.state.password, {
+      fetch("https://stumarkt.herokuapp.com/api/login?email=" + this.state.email + "&password=" + this.state.password, {
         headers: {
           "x_auth": API_KEY
         }
@@ -38,20 +38,20 @@ export default class Login extends Component{
       .then(response => {return response.json()})
       .then(data => {
         if (data.error && data.error == "User not found") 
-          return this.setState({"error": "Sorry, your email or password is wrong"});
+          return this.setState({"error": "Üzgünüz, e-posta adresiniz yanlış."});
         if (data.error)
-          return this.setState({"error": "Unknown error, please try again"});
+          return this.setState({"error": "Bilinmeyen bir hata oluştu."});
 
         this.addUserToAsyncStorage(this.state.email, this.state.password, () => {
           this.props.navigation.push('main', {"user": data.user});
         });
       })
       .catch(err => {
-        return this.setState({"error": "You must have internet connection to login"});
+        return this.setState({"error": "Giriş yapmak için internet bağlantınız olmalı."});
       });
     } else {
       this.setState({
-        "error": "Please write your email and password"
+        "error": "Lütfen e-posta adresinizi yazın."
       });
     }
   }
@@ -64,7 +64,7 @@ export default class Login extends Component{
           <View style={styles.formWrapper}>
             <View style={styles.header} >
               <Text style={styles.title} >
-                Einloggen
+                Giriş Yap
               </Text>
               {/* <TouchableOpacity style={styles.lostPasswordWrapper} >
                 <Text style={styles.lostPassword} > Passwort </Text>
@@ -73,14 +73,14 @@ export default class Login extends Component{
             </View>
             <TextInput 
               style={styles.emailInput}
-              placeholder="Email"
+              placeholder="E-posta"
               onChangeText={(email) => { this.setState({email: email})}}
             >
             </TextInput>
             <TextInput
               secureTextEntry={true}
               style={styles.passwordInput}
-              placeholder="Passwort"
+              placeholder="Şifre"
               onChangeText={(password) => {this.setState({password: password})}}
             >
             </TextInput>
@@ -88,18 +88,18 @@ export default class Login extends Component{
               onPress={this.onLoginPageSend.bind(this)} 
               style={styles.sendButton}
             >
-              <Text style={styles.sendButtonText} > Einloggen </Text>
+              <Text style={styles.sendButtonText} >Giriş Yap</Text>
             </ TouchableOpacity>
             <View style={styles.errorLineWrapper} >
               <Text style={styles.errorLine} > {this.state.error} </Text>
             </View>
           </View>
           <View style={styles.bottomLink} >
-            <Text style={styles.bottomLinkInfo} > Noch nicht registriert? </Text>
+            <Text style={styles.bottomLinkInfo} >Üye değil misin?</Text>
             <TouchableOpacity
               onPress={() => {this.props.navigation.navigate('register')}} 
             >
-              <Text style={styles.bottomLinkButton} > In 30 Sekunden registrieren </Text>
+              <Text style={styles.bottomLinkButton} >30 saniyede üye ol!</Text>
             </TouchableOpacity>
           </View>
         </View>
