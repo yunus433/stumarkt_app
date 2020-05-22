@@ -20,7 +20,7 @@ export default class Index extends Component{
       products: [],
       totalProductNumber: 0,
       page: this.props.navigation.getParam('page', 0),
-      universities: this.props.navigation.getParam('universities', undefined),
+      filter: this.props.navigation.getParam('filter', undefined),
       cities: this.props.navigation.getParam('cities', undefined),
       productNumberPerPage: 10,
       category: this.props.navigation.getParam('category', "all"),
@@ -45,8 +45,8 @@ export default class Index extends Component{
     if (page < 0)
       page = this.state.page;
 
-    if (this.state.universities) {
-      fetch(`https://stumarkt.herokuapp.com/api/products?category=${this.state.category}&limit=${this.state.productNumberPerPage}&page=${page}&keywords=${this.state.search}&filter=${this.state.universities.join(',')}`, {
+    if (this.state.filter) {
+      fetch(`https://stumarkt.herokuapp.com/api/products?category=${this.state.category}&limit=${this.state.productNumberPerPage}&page=${page}&keywords=${this.state.search}&filter=${this.state.filter.join(',')}`, {
         headers: {
           "x_auth": API_KEY
         }
@@ -217,7 +217,7 @@ export default class Index extends Component{
       <View style={styles.mainWrapper}>
         <Header navigation={this.props.navigation} ></Header>
         <View style={styles.content} >
-          <Text style={styles.contentTitle} > {this.state.categoryName} kategorisinde {this.state.totalProductNumber} ürün bulundu. {this.state.search ? "Arama kelimeleri: " + this.state.search.join(" ") : ""} </Text>
+          <Text style={styles.contentTitle} > {this.state.categoryName} kategorisinde {this.state.totalProductNumber} ürün bulundu. {this.state.search ? "Arama kelimeleri: " + this.state.search.join(" ") + "." : ""} {this.state.cities ? "Seçilen şehirler: " + this.state.cities.join(" ") + "." : ""}</Text>
           <ScrollView style={styles.innerContent} ref="_innerContentScrollView" >
             {
               this.state.products.map((product, key) => {
@@ -228,7 +228,7 @@ export default class Index extends Component{
                     </View>
                     <View style={styles.eachProductRightSide} >
                       <Text style={styles.eachProductName} numberOfLines={1} > {product.name} </Text>
-                      <Text style={styles.eachProductLocation} > {product.location} </Text>
+                      <Text style={styles.eachProductLocation} >{product.city_name}, {product.town}</Text>
                       <View style={styles.addToFavoriteWrapper} >
                         <TouchableOpacity onPress={() => {this.addToFavorites(product._id)}} style={{marginRight: 5}} >
                           { this.state.user.favorites.includes(product._id) ? 

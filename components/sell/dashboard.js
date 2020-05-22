@@ -62,7 +62,7 @@ export default class SellDashboard extends Component{
                         <View style={styles.eachProductRightSide} >
                           <Text style={styles.eachProductName} numberOfLines={1} > {product.name} </Text>
                           <Text style={styles.eachProductLocation} > {product.location} </Text>
-                          <Text style={styles.eachProductPrice} > {product.price} </Text>
+                          <Text style={styles.eachProductPrice} >{product.city_name}, {product.town}</Text>
                         </View>
                       </TouchableOpacity>
                     );

@@ -88,7 +88,7 @@ export default class Index extends Component{
                     </View>
                     <View style={styles.eachProductRightSide} >
                       <Text style={styles.eachProductName} numberOfLines={1} > {product.name} </Text>
-                      <Text style={styles.eachProductLocation} > {product.location} </Text>
+                      <Text style={styles.eachProductLocation} >{product.city_name}, {product.town}</Text>
                       <View style={styles.addToFavoriteWrapper} >
                         <TouchableOpacity onPress={() => {this.addToFavorites(product._id)}} style={{marginRight: 5}} >
                           { this.state.user.favorites.includes(product._id) ? 

@@ -132,7 +132,7 @@ export default class MessageDetails extends Component{
     }
   }
 
-  componentWillMount() {
+  componentDidMount = () => {
     this.getAllMessages();
   }
 

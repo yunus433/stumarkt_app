@@ -25,9 +25,8 @@ export default class New extends Component{
       description: '',
       price: '',
       otherPrice: '',
-      address1: '',
-      address2: '',
-      address3: '',
+      city: '',
+      town: '',
       completed: false
     };
   }
@@ -50,8 +49,12 @@ export default class New extends Component{
       });
   }
 
+  getCityEngName = (city) => {
+    return city.toLocaleLowerCase().replace("ş", "s").replace("ı", "i").replace("ö", "o").replace("ç", "c").replace("ü", "u").replace("ğ", "g");
+  }
+
   sendNewProductButton = () => {
-    if (this.state.category && this.state.name && this.state.description && this.state.price && this.state.address1 && this.state.address2) {
+    if (this.state.category && this.state.name && this.state.description && this.state.price && this.state.city && this.state.town) {
       fetch("https://stumarkt.herokuapp.com/api/newProduct", {
         method: "POST",
         headers: {
@@ -63,9 +66,8 @@ export default class New extends Component{
           "name": this.state.name,
           "description": this.state.description,
           "price": this.state.price + "₺",
-          "address1": this.state.address1,
-          "address2": this.state.address2,
-          "address3": this.state.address3,
+          "city": this.getCityEngName(this.state.city),
+          "town": this.state.town,
           "userId": this.state.user._id.toString(),
           "university": this.state.user.university,
           "productPhotoNameArray": this.state.productPhotoNameArray
@@ -568,23 +570,18 @@ export default class New extends Component{
                     <Text style={styles.contentTitle} >Adres</Text>
                     <View style={styles.addressLine} >
                       <TextInput
-                        placeholder="İlçe" 
-                        onChangeText={(address1) => { this.setState({address1: address1})}}
+                        placeholder="Şehir" 
+                        onChangeText={(city) => { this.setState({city: city})}}
                         style={styles.addressInputOne} >
                       </TextInput>
                       <Text style={styles.requiredItemSymbol} >* </Text>
                       <TextInput
-                        placeholder="Şehir" 
-                        onChangeText={(address2) => { this.setState({address2: address2})}}
+                        placeholder="İlçe" 
+                        onChangeText={(town) => { this.setState({town: town})}}
                         style={styles.addressInputTwo} >
                       </TextInput>
                       <Text style={styles.requiredItemSymbol} >* </Text>
                     </View>
-                    <TextInput
-                        placeholder="Posta Kodu" 
-                        onChangeText={(address3) => { this.setState({address3: address3})}}
-                        style={styles.addressInputThree} >
-                    </TextInput>
                     <Text style={styles.contentTitle} >Gizlilik Antlaşmaları:<Text style={styles.requiredItemSymbol} >* </Text> </Text>
                     <View style={styles.agreementWrapper} >
                       <Text style={styles.agreementText} >Bu ürünü oluşturarak aşağıdaki antlaşmaları kabul etmiş olursun: </Text>

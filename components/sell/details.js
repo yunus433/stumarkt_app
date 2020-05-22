@@ -20,11 +20,12 @@ export default class SellDetails extends Component{
       description: '',
       price: '',
       otherPrice: '',
-      address: ''
+      city: '',
+      town: ''
     };
   };
 
-  componentWillMount = () => {
+  componentDidMount = () => {
     fetch(`https://stumarkt.herokuapp.com/api/products?id=${this.state.productId}`, {
       headers: {
         "x_auth": API_KEY
@@ -40,7 +41,8 @@ export default class SellDetails extends Component{
           "description": data.product.description,
           "price": data.product.price,
           "otherPrice": data.product.price,
-          "address": data.product.location
+          "city": data.product.city_name,
+          "town": data.product.town
         })
       })
       .catch((err) => {
@@ -66,7 +68,8 @@ export default class SellDetails extends Component{
         "name": this.state.name,
         "description": this.state.description,
         "price": this.state.price,
-        "location": this.state.address
+        "city": this.state.city,
+        "town": this.state.town
       })
     })
       .then(response => {return response.json()})
@@ -186,12 +189,20 @@ export default class SellDetails extends Component{
                   </TouchableOpacity>
                 </View>
                 <Text style={styles.contentTitle} >Şehir</Text>
-                <TextInput
-                  placeholder="Şehir" 
-                  onChangeText={(address) => { this.setState({address: address})}}
-                  style={styles.addressInput} >
-                {this.state.address}
-                </TextInput>
+                <View style={{flexDirection: "row"}} >
+                  <TextInput
+                    placeholder="Şehir" 
+                    onChangeText={(city) => { this.setState({city: city})}}
+                    style={styles.addressInputOne} >
+                  {this.state.city}
+                  </TextInput>
+                  <TextInput
+                    placeholder="İlçe" 
+                    onChangeText={(town) => { this.setState({town: town})}}
+                    style={styles.addressInputTwo} >
+                  {this.state.town}
+                  </TextInput>
+                </View>
                 <Text style={styles.contentTitle} >Gizlilik Antlaşmaları:</Text>
                 <View style={styles.agreementWrapper} >
                   <Text style={styles.agreementText} >Bu ürünü oluşturarak aşağıdaki antlaşmaları kabul etmiş olursun: </Text>
@@ -284,7 +295,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
     borderColor: "rgb(236, 235, 235)", borderWidth: 2, borderRadius: 15,
-    color: "rgb(112, 112, 112)", fontWeight: "300", fontSize: 20
+    color: "rgb(112, 112, 112)", fontWeight: "300", fontSize: 20, textAlignVertical: "top"
   },
   priceWrapper: {
     paddingLeft: 20,

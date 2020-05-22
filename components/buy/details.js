@@ -118,7 +118,7 @@ export default class BuyDetails extends Component{
       });
   };
 
-  componentWillMount() {
+  componentDidMount = () => {
     this.getProductDetails();
   }
   
@@ -177,7 +177,7 @@ export default class BuyDetails extends Component{
               <Text style={styles.productCreatedAt} >{this.state.product.createdAt} tarihinde eklendi.</Text>
               <View style={styles.productLocationWrapper} >
                 <Image source={require('./../../assets/location-logo.png')} style={styles.productLocationLogo} ></Image>
-                <Text style={styles.productLocation} >{this.state.product.location}</Text>
+                <Text style={styles.productLocation} >{this.state.product.city_name}, {this.state.product.town}</Text>
               </View>
               <Text style={styles.productDescription} >{this.state.product.description}</Text>
               <View style={styles.addToFavoriteWrapper} >
@@ -209,7 +209,7 @@ export default class BuyDetails extends Component{
                       </View>
                       <View style={styles.eachProductRightSide} >
                         <Text style={styles.eachProductName} numberOfLines={1} > {product.name} </Text>
-                        <Text style={styles.eachProductLocation} > {product.location} </Text>
+                        <Text style={styles.eachProductLocation} >{product.city_name}, {product.town}</Text>
                         <Text style={styles.eachProductPrice} > {product.price} </Text>
                       </View>
                     </TouchableOpacity>
@@ -325,8 +325,7 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   messagesInput: {
-    color: "rgb(112, 112, 112)",
-    fontSize: 20,
+    color: "rgb(112, 112, 112)",  fontSize: 20, textAlignVertical: "top",
     padding: 10,
     borderColor: "rgb(236, 235, 235)",
     borderWidth: 2,
