@@ -206,7 +206,7 @@ export default class MessageDetails extends Component{
             onLayout={(event) => {
               this.setState({"messageInputWrapperHeight": event.nativeEvent.layout.height + 25}); 
             }} >
-            <TextInput style={styles.messageInput} placeholder="Type your message" value={this.state.messageContent} onChangeText={(content) => { this.setState({messageContent: content})}} ref="_messageInput" ></TextInput>
+            <TextInput style={styles.messageInput} placeholder="Mesajınızı yazın" value={this.state.messageContent} onChangeText={(content) => { this.setState({messageContent: content})}} ref="_messageInput" ></TextInput>
             <TouchableOpacity style={styles.messageSendButton}  onPress={() => {this.onNewMessageSend()}} >
               <Image source={require('./../../assets/send-icon.png')} style={styles.sendIcon} ></Image>
             </TouchableOpacity>

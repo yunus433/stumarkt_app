@@ -99,7 +99,7 @@ export default class Login extends Component{
             <TouchableOpacity
               onPress={() => {this.props.navigation.navigate('register')}} 
             >
-              <Text style={styles.bottomLinkButton} >30 saniyede üye ol!</Text>
+              <Text style={styles.bottomLinkButton} >Hemen aramıza katıl!</Text>
             </TouchableOpacity>
           </View>
         </View>

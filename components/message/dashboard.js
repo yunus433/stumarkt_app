@@ -143,10 +143,10 @@ export default class MessageDetails extends Component{
         <View style={styles.content} >
           <View style={styles.messageChangeButtonsWrapper} >
             <TouchableOpacity style={this.state.messagesOn == "buyerMessages" ? styles.messageChangeButtonActive : styles.messageChangeButton} onPress={() => {this.setState({"messagesOn": "buyerMessages"})}} >
-              <Text style={styles.messageChangeButtonText} >Einkauf</Text>
+              <Text style={styles.messageChangeButtonText} >Aldıklarım</Text>
             </TouchableOpacity>
             <TouchableOpacity style={this.state.messagesOn == "ownerMessages" ? styles.messageChangeButtonActive : styles.messageChangeButton} onPress={() => {this.setState({"messagesOn": "ownerMessages"})}} >
-              <Text style={styles.messageChangeButtonText} >Verkauf</Text>
+              <Text style={styles.messageChangeButtonText} >Sattıklarım</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.messagesWrapper} >
@@ -161,7 +161,7 @@ export default class MessageDetails extends Component{
                         <Text style={styles.eachMessageProductName} >{message.productName}</Text>
                         <View style={{flexDirection: "row"}} >
                           <Text style={styles.eachMessageUserName} >{message.ownerName} - </Text>
-                          <Text style={styles.eachMessageTotalNumber} >{message.messages.length} message{message.messages.length > 1 ? 's' : ''}</Text>
+                          <Text style={styles.eachMessageTotalNumber} >{message.messages.length} mesaj</Text>
                         </View>
                       </View>
                       { message.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == 'owner'}).length ? 
@@ -174,7 +174,7 @@ export default class MessageDetails extends Component{
                   )})
                   :
                   <View style={styles.noMessageWrapper} >
-                    <Text style={styles.noMessageText} >Du hast noch keine Nachricht geschrieben.</Text>
+                    <Text style={styles.noMessageText} >Hiçbir ürüne mesaj atmadınız.</Text>
                   </View>
                 :
                 this.state.ownerMessages.length ?
@@ -186,7 +186,7 @@ export default class MessageDetails extends Component{
                         <Text style={styles.eachMessageProductName} >{message.productName}</Text>
                         <View style={{flexDirection: "row"}} >
                           <Text style={styles.eachMessageUserName} >{message.buyerName} - </Text>
-                          <Text style={styles.eachMessageTotalNumber} >{message.messages.length} message{message.messages.length > 1 ? 's' : ''}</Text>
+                          <Text style={styles.eachMessageTotalNumber} >{message.messages.length} mesaj</Text>
                         </View>
                       </View>
                       { message.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == 'buyer'}).length ? 
@@ -199,7 +199,7 @@ export default class MessageDetails extends Component{
                   )})
                   :
                   <View style={styles.noMessageWrapper} >
-                    <Text style={styles.noMessageText} >Du hast leider keine Nachricht für deine Produkten.</Text>
+                    <Text style={styles.noMessageText} >Hiçbir ürününüze mesaj atılmamış.</Text>
                   </View>
               }
             </ScrollView>

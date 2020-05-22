@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { ActivityIndicator, AppRegistry, Text, View, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView} from 'react-native';
+import { ActivityIndicator, AppRegistry, Text, View, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -62,7 +62,7 @@ export default class New extends Component{
           "category": this.state.category,
           "name": this.state.name,
           "description": this.state.description,
-          "price": this.state.price,
+          "price": this.state.price + "₺",
           "address1": this.state.address1,
           "address2": this.state.address2,
           "address3": this.state.address3,
@@ -551,13 +551,14 @@ export default class New extends Component{
                     <Text style={styles.contentTitle} >Fiyat<Text style={styles.requiredItemSymbol} >* </Text> </Text>
                     <View style={styles.priceWrapper} >
                       <TouchableOpacity onPress={() => this.priceInput(this.state.otherPrice)} style={styles.eachCategoryWrapper} >
-                          <View style={ this.state.price != "free" && this.state.otherPrice ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                          <TextInput 
-                            placeholder="Preis €" 
-                            onChangeText={(price) => {this.priceInput(price)}} 
-                            style={styles.priceInput} >
-                          {this.state.otherPrice}
-                          </TextInput>
+                        <View style={ this.state.price != "free" && this.state.otherPrice ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
+                        <TextInput 
+                          placeholder="Fiyat (₺)" 
+                          onChangeText={(price) => {this.priceInput(price)}} 
+                          style={styles.priceInput} 
+                          keyboardType='numeric'>
+                        {this.state.otherPrice}
+                        </TextInput>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.priceInput("free")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.price == "free" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
@@ -587,15 +588,15 @@ export default class New extends Component{
                     <Text style={styles.contentTitle} >Gizlilik Antlaşmaları:<Text style={styles.requiredItemSymbol} >* </Text> </Text>
                     <View style={styles.agreementWrapper} >
                       <Text style={styles.agreementText} >Bu ürünü oluşturarak aşağıdaki antlaşmaları kabul etmiş olursun: </Text>
-                      <TouchableOpacity>
+                      <TouchableOpacity onPress={() => { Linking.openURL('https://stumarkt.com/auth/agreement/one') }}>
                         <Text style={styles.agreementLink} >Hizmet Koşulları</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity>
+                      <TouchableOpacity onPress={() => { Linking.openURL('https://stumarkt.com/auth/agreement/two') }}>
                         <Text style={styles.agreementLink} >Gizlilik Sözleşmesi</Text>
                       </TouchableOpacity>
                     </View>
                     <TouchableOpacity style={styles.sendButton} onPress={() => {this.sendNewProductButton()}} >
-                      <Text style={styles.sendButtonText} >Düzenle</Text>
+                      <Text style={styles.sendButtonText} >Ekle</Text>
                     </ TouchableOpacity>
                   </View>
                 </ScrollView>
@@ -706,7 +707,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
     borderColor: "rgb(236, 235, 235)", borderWidth: 2, borderRadius: 15,
-    color: "rgb(112, 112, 112)", fontWeight: "300", fontSize: 20
+    color: "rgb(112, 112, 112)", fontWeight: "300", fontSize: 20, textAlignVertical: "top"
   },
   imagesWrapper: {
     flexDirection: "row", alignItems: "center", marginBottom: 20

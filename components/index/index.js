@@ -24,7 +24,7 @@ export default class Index extends Component{
       cities: this.props.navigation.getParam('cities', undefined),
       productNumberPerPage: 10,
       category: this.props.navigation.getParam('category', "all"),
-      categoryName: this.props.navigation.getParam('categoryName', "Alle Categorien"),
+      categoryName: this.props.navigation.getParam('categoryName', "Tüm Ürünler"),
       productFetchComplete: false
     };
   };
@@ -171,9 +171,9 @@ export default class Index extends Component{
   }
 
   componentDidMount = async () => {
-    if (this.state.user && !this.state.user.verified) {
-      return this.props.navigation.navigate('verify', {"user": this.state.user})
-    } else {
+    // if (this.state.user && !this.state.user.verified) {
+    //   return this.props.navigation.navigate('verify', {"user": this.state.user})
+    // } else {
       this.getLatestProducts(this.state.page);
 
       try {
@@ -184,7 +184,7 @@ export default class Index extends Component{
       } catch (error) {
         return alert("Err: " + error);
       }
-    }
+    // }
   }
 
   addToFavorites = (id) => {
@@ -217,7 +217,7 @@ export default class Index extends Component{
       <View style={styles.mainWrapper}>
         <Header navigation={this.props.navigation} ></Header>
         <View style={styles.content} >
-          <Text style={styles.contentTitle} > {this.state.categoryName} kategorisinde {this.state.totalProductNumber} ürün bulundu. Arama kelimeleri:  {this.state.search} </Text>
+          <Text style={styles.contentTitle} > {this.state.categoryName} kategorisinde {this.state.totalProductNumber} ürün bulundu. {this.state.search ? "Arama kelimeleri: " + this.state.search.join(" ") : ""} </Text>
           <ScrollView style={styles.innerContent} ref="_innerContentScrollView" >
             {
               this.state.products.map((product, key) => {

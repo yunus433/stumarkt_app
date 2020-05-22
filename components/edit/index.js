@@ -43,7 +43,7 @@ export default class Index extends Component{
               <Text style={styles.userUni} >{this.state.user.university}</Text>
             </View>
             <TouchableOpacity style={styles.productsButton} onPress={() => {this.props.navigation.navigate('sellDashboard', {'user': this.state.user})}}>
-              <Text style={styles.productsButtonText} >Ürünlerim: </Text>
+              <Text style={styles.productsButtonText} >Ürünlerim</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.logoutButton} onPress={() => {this.logoutButtonController()}}>
               <Text style={styles.logoutButtonText} >Çıkış Yap</Text>
