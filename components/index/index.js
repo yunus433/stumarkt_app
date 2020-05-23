@@ -117,73 +117,11 @@ export default class Index extends Component{
       this.props.navigation.push('buyDetails', {"user": this.state.user, "id": productId})
   }
 
-  sendUserNotificationToken = async () => {
-    const token = await Notifications.getExpoPushTokenAsync();
-    
-    fetch("https://stumarkt.herokuapp.com/api/notifications", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x_auth": API_KEY
-      },
-      body: JSON.stringify({
-        "id": this.state.user._id,
-        "token": token
-      })
-    })
-    .then(response => {return response.json()})
-    .then(data => {
-      if (data && data.error)
-        return alert("Err: " + data.error);
-  
-      if (data && data.user)
-        this.setState({
-          "user": data.user
-        });
-    })
-    .catch(err => {
-      return alert("Err: " + err);
-    });
-  }
-
-  addNotificationStatusToAsyncStorage = async (status) => {
-    try {
-      await AsyncStorage.setItem('notificationPermissionStatus', status);
-    } catch (error) {
-      alert("An unknown error occured, please try again.");
-    }
-  }
-
-  getNotificationPermission = async () => {
-    const permission = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-    if (permission.status !== 'granted') {
-        const newPermission = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-        if (newPermission.status === 'granted') {
-          this.sendUserNotificationToken();
-          this.addNotificationStatusToAsyncStorage("allowed");
-        } else {
-          this.addNotificationStatusToAsyncStorage("not allowed");
-        }
-    } else {
-      this.sendUserNotificationToken();
-      this.addNotificationStatusToAsyncStorage("allowed");
-    }
-  }
-
   componentDidMount = async () => {
     // if (this.state.user && !this.state.user.verified) {
     //   return this.props.navigation.navigate('verify', {"user": this.state.user})
     // } else {
       this.getLatestProducts(this.state.page);
-
-      try {
-        const notificationPermissionStatus = await AsyncStorage.getItem('notificationPermissionStatus');
-
-        if (notificationPermissionStatus == null)
-          this.getNotificationPermission();
-      } catch (error) {
-        return alert("Err: " + error);
-      }
     // }
   }
 

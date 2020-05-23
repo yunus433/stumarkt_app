@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Animated, Keyboard, AppRegistry, Text, Image, View, StyleSheet, TextInput, TouchableOpacity, ScrollView} from 'react-native';
+import {Animated, Keyboard, AppRegistry, Text, Image, View, StyleSheet, TextInput, TouchableOpacity, Platform, ScrollView} from 'react-native';
 import socketIO from 'socket.io-client';
 import Constants from 'expo-constants';
 import { API_KEY } from 'react-native-dotenv';
@@ -25,22 +25,40 @@ export default class MessageDetails extends Component{
       messageContent: this.props.navigation.getParam('messageContent', ""),
       messageInputWrapperHeight: 0,
       user: this.props.navigation.getParam('user', false),
-      buyer: this.props.navigation.getParam('buyer', false),
-      owner: this.props.navigation.getParam('owner', false),
-      product: this.props.navigation.getParam('product', false),
-      messagesOf: this.props.navigation.getParam('messagesOf', false),
+      chat_id: this.props.navigation.getParam('id', false),
       messages: [],
-      message: null
+      chat: null
     };
 
     this.scrollView = React.createRef();
     this.keyboardHeight = new Animated.Value(20);
     this.messagesWrapperMarginBottom = new Animated.Value(0);
+
+    if (Platform.OS == "ios") {
+      this.keyboardWillShowSub = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
+      this.keyboardWillHideSub = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
+    } else {
+      this.keyboardWillShowSub = Keyboard.addListener('keyboardDidShow', this.keyboardWillShow);
+      this.keyboardWillHideSub = Keyboard.addListener('keyboardDidHide', this.keyboardWillHide);
+    }
   };
 
   componentWillUnmount() {
-    this.keyboardWillShowSub.remove();
-    this.keyboardWillHideSub.remove();
+    fetch(`https://stumarkt.herokuapp.com/api/messages/details?id=${this.state.chat_id}&user=${this.state.user._id.toString()}`, {
+      headers: {
+        "x_auth": API_KEY
+      }
+    })
+      .then(response => {return response.json()})
+      .then(data => {
+        if (data.error) return alert("Err: " + data.error);
+  
+        this.keyboardWillShowSub.remove();
+        this.keyboardWillHideSub.remove();
+      })
+      .catch((err) => {
+        return alert("Err: " + err);
+      });
   }
 
   keyboardWillShow = (event) => {
@@ -49,7 +67,7 @@ export default class MessageDetails extends Component{
     Animated.parallel([
       Animated.timing(this.keyboardHeight, {
         duration: (Platform.OS == "ios" ? event.duration : 0),
-        toValue: event.endCoordinates.height + (Platform.OS == "ios" ? 10 : 10),
+        toValue: event.endCoordinates.height + 10,
       }),
       Animated.timing(this.messagesWrapperMarginBottom, {
         duration: (Platform.OS == "ios" ? event.duration : 0),
@@ -74,15 +92,27 @@ export default class MessageDetails extends Component{
     ]).start();
   };
 
-  componentDidMount = () => {
-    if (Platform.OS == "ios") {
-      this.keyboardWillShowSub = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
-      this.keyboardWillHideSub = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
-    } else {
-      this.keyboardWillShowSub = Keyboard.addListener('keyboardDidShow', this.keyboardWillShow);
-      this.keyboardWillHideSub = Keyboard.addListener('keyboardDidHide', this.keyboardWillHide);
-    }
+  get_content = () => {
+    fetch(`https://stumarkt.herokuapp.com/api/messages/details?id=${this.state.chat_id}&user=${this.state.user._id.toString()}`, {
+      headers: {
+        "x_auth": API_KEY
+      }
+    })
+      .then(response => {return response.json()})
+      .then(data => {
+        if (data.error) return alert("Err: " + data.error);
+  
+        return this.setState({
+          "messages": data.chat.messages,
+          "chat": data.chat
+        });
+      })
+      .catch((err) => {
+        return alert("Err: " + err);
+      });
+  }
 
+  componentDidMount = () => {
     const socket = socketIO('https://stumarkt.herokuapp.com');
     
     socket.connect();
@@ -105,44 +135,24 @@ export default class MessageDetails extends Component{
       });
     });
 
+    this.get_content();
+
     if (this.props.navigation.getParam('messageContent', undefined)) {
       this.refs._messageInput.focus();
     }
 
-    fetch('https://stumarkt.herokuapp.com/api/messages?buyer=' + this.state.buyer._id + '&product=' + this.state.product._id + '&sendedBy=' + (this.state.messagesOf == 'buyer' ? 'owner' : 'buyer') + '&user=' + this.state.user._id, {
-      headers: {
-        "x_auth": API_KEY
-      }
-    })
-      .then(response => {return response.json()})
-      .then(data => {
-        if (data.error) return alert("Err: " + data.error);
-  
-        this.setState({
-          "messages": data.message.messages,
-          "message": data.message
-        });
-      })
-      .catch((err) => {
-        return alert("Err: " + err);
-      });
   };
 
   onNewMessageSend = () => {
     if (this.state.messageContent.length > 0 && this.socket) {
       const newMessageObject = {
         content: this.state.messageContent,
-        buyerId: this.state.buyer._id,
-        ownerId: this.state.owner._id,
-        productId: this.state.product._id,
-        sendedBy: this.state.messagesOf,
-        read: false,
-        createdAt: ""
+        sendedBy: this.state.user._id.toString()
       };
 
       this.socket.emit('newMessageSend', {
         message: newMessageObject,
-        to: this.state[this.state.messagesOf]._id
+        to: this.state.chat_id
       }, (err, message) => {
         if (err) return alert("Err " + err);
 
@@ -164,109 +174,114 @@ export default class MessageDetails extends Component{
     return (
       <View style={styles.mainWrapper}>
         <Header navigation={this.props.navigation}></Header>
-        <View style={styles.content} >
-          <View style={styles.contentHeader} >
-            <TouchableOpacity onPress={() => {this.props.navigation.push("messageDashboard", {"user": this.state.user});}} >
-              <Image source={require('./../../assets/back-button.png')} style={styles.navButtonImage} ></Image>
-            </TouchableOpacity>
-            { this.state.messagesOf == "buyer" ? 
-              <View style={{flexDirection: "row", alignItems: "center"}} >
-                <Image source={{uri: this.state.owner.profilePhoto}} style={styles.userProfilePhoto} ></Image>
-                <Text style={styles.userName} >{this.state.owner.name}</Text>
-              </View>
-              :
-              <View style={{flexDirection: "row", alignItems: "center"}} >
-                <Image source={{uri: this.state.buyer.profilePhoto}} style={styles.userProfilePhoto} ></Image>
-                <Text style={styles.userName} >{this.state.buyer.name}</Text>
-              </View>
-            }
-          </View>
-          <Animated.ScrollView style={[styles.messageWrapper, {marginBottom: this.state.clicked ? this.messagesWrapperMarginBottom : this.state.messageInputWrapperHeight}]} ref={this.scrollView}
-            onContentSizeChange={() => {  
-            this.scrollView.current._component.scrollToEnd({animated: false});
-          }} >
-            {
-              this.state.messages.map((message, key) => {
-                if (message.sendedBy == this.state.messagesOf) {
-                  if (key == 0) {
-                    return (
-                      <View key={key} >
-                        <View style={styles.day_wrapper} >
-                          <Text style={styles.each_day} >{message.day}</Text>
-                        </View>
-                        <View style={styles.each_message_wrapper_user} >
-                          <Text style={styles.each_message_text_user} >{message.content}</Text>
-                          <Text style={styles.each_message_time_user} >{message.time}</Text>
-                        </View>
-                      </View>
-                    );
-                  } else if (message.day != this.state.messages[key-1].day) {
-                    return (
-                      <View key={key} >
-                        <View style={styles.day_wrapper} >
-                          <Text style={styles.each_day} >{message.day}</Text>
-                        </View>
-                        <View style={styles.each_message_wrapper_user} >
-                          <Text style={styles.each_message_text_user} >{message.content}</Text>
-                          <Text style={styles.each_message_time_user} >{message.time}</Text>
-                        </View>
-                      </View>
-                    );
-                  } else {
-                    return (
-                      <View key={key} style={styles.each_message_wrapper_user} >
-                        <Text style={styles.each_message_text_user} >{message.content}</Text>
-                        <Text style={styles.each_message_time_user} >{message.time}</Text>
-                      </View>
-                    );
-                  }
-                } else {
-                  if (key == 0) {
-                    return (
-                      <View key={key} >
-                        <View style={styles.day_wrapper} >
-                          <Text style={styles.each_day} >{message.day}</Text>
-                        </View>
-                        <View style={styles.each_message_wrapper} >
-                          <Text style={styles.each_message_text} >{message.content}</Text>
-                          <Text style={styles.each_message_time} >{message.time}</Text>
-                        </View>
-                      </View>
-                    );
-                  } else if (message.day != this.state.messages[key-1].day) {
-                    return (
-                      <View key={key} >
-                        <View style={styles.day_wrapper} >
-                          <Text style={styles.each_day} >{message.day}</Text>
-                        </View>
-                        <View style={styles.each_message_wrapper} >
-                          <Text style={styles.each_message_text} >{message.content}</Text>
-                          <Text style={styles.each_message_time} >{message.time}</Text>
-                        </View>
-                      </View>
-                    );
-                  } else {
-                    return (
-                      <View key={key} style={styles.each_message_wrapper} >
-                        <Text style={styles.each_message_text} >{message.content}</Text>
-                        <Text style={styles.each_message_time} >{message.time}</Text>
-                      </View>
-                    );
-                  }
-                }
-              })
-            }
-          </Animated.ScrollView>
-          <Animated.View style={[styles.messageInputWrapper, {bottom: this.keyboardHeight}]} 
-            onLayout={(event) => {
-              this.setState({"messageInputWrapperHeight": event.nativeEvent.layout.height + 25}); 
+        {this.state.chat ?
+          <View style={styles.content} >
+            <View style={styles.contentHeader} >
+              <TouchableOpacity onPress={() => {this.props.navigation.push("messageDashboard", {"user": this.state.user});}} >
+                <Image source={require('./../../assets/back-button.png')} style={styles.navButtonImage} ></Image>
+              </TouchableOpacity>
+              { this.state.user._id.toString() == this.state.chat.buyer._id.toString() ? 
+                <View style={{flexDirection: "row", alignItems: "center"}} >
+                  <Image source={{uri: this.state.chat.owner.profilePhoto}} style={styles.userProfilePhoto} ></Image>
+                  <Text style={styles.userName} >{this.state.chat.owner.name}</Text>
+                </View>
+                :
+                <View style={{flexDirection: "row", alignItems: "center"}} >
+                  <Image source={{uri: this.state.chat.buyer.profilePhoto}} style={styles.userProfilePhoto} ></Image>
+                  <Text style={styles.userName} >{this.state.chat.buyer.name}</Text>
+                </View>
+              }
+            </View>
+            <Animated.ScrollView style={[styles.messageWrapper, {marginBottom: this.state.clicked ? this.messagesWrapperMarginBottom : this.state.messageInputWrapperHeight}]} ref={this.scrollView}
+              onContentSizeChange={() => {  
+              this.scrollView.current._component.scrollToEnd({animated: false});
             }} >
-            <TextInput style={styles.messageInput} placeholder="Mesajınızı yazın" value={this.state.messageContent} onChangeText={(content) => { this.setState({messageContent: content})}} ref="_messageInput" ></TextInput>
-            <TouchableOpacity style={styles.messageSendButton}  onPress={() => {this.onNewMessageSend()}} >
-              <Image source={require('./../../assets/send-icon.png')} style={styles.sendIcon} ></Image>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
+              {
+                this.state.messages.map((message, key) => {
+                  if (message.sendedBy == this.state.user._id.toString()) {
+                    if (key == 0) {
+                      return (
+                        <View key={key} >
+                          <View style={styles.day_wrapper} >
+                            <Text style={styles.each_day} >{message.day}</Text>
+                          </View>
+                          <View style={styles.each_message_wrapper_user} >
+                            <Text style={styles.each_message_text_user} >{message.content}</Text>
+                            <Text style={styles.each_message_time_user} >{message.time}</Text>
+                          </View>
+                        </View>
+                      );
+                    } else if (message.day != this.state.messages[key-1].day) {
+                      return (
+                        <View key={key} >
+                          <View style={styles.day_wrapper} >
+                            <Text style={styles.each_day} >{message.day}</Text>
+                          </View>
+                          <View style={styles.each_message_wrapper_user} >
+                            <Text style={styles.each_message_text_user} >{message.content}</Text>
+                            <Text style={styles.each_message_time_user} >{message.time}</Text>
+                          </View>
+                        </View>
+                      );
+                    } else {
+                      return (
+                        <View key={key} style={styles.each_message_wrapper_user} >
+                          <Text style={styles.each_message_text_user} >{message.content}</Text>
+                          <Text style={styles.each_message_time_user} >{message.time}</Text>
+                        </View>
+                      );
+                    }
+                  } else {
+                    if (key == 0) {
+                      return (
+                        <View key={key} >
+                          <View style={styles.day_wrapper} >
+                            <Text style={styles.each_day} >{message.day}</Text>
+                          </View>
+                          <View style={styles.each_message_wrapper} >
+                            <Text style={styles.each_message_text} >{message.content}</Text>
+                            <Text style={styles.each_message_time} >{message.time}</Text>
+                          </View>
+                        </View>
+                      );
+                    } else if (message.day != this.state.messages[key-1].day) {
+                      return (
+                        <View key={key} >
+                          <View style={styles.day_wrapper} >
+                            <Text style={styles.each_day} >{message.day}</Text>
+                          </View>
+                          <View style={styles.each_message_wrapper} >
+                            <Text style={styles.each_message_text} >{message.content}</Text>
+                            <Text style={styles.each_message_time} >{message.time}</Text>
+                          </View>
+                        </View>
+                      );
+                    } else {
+                      return (
+                        <View key={key} style={styles.each_message_wrapper} >
+                          <Text style={styles.each_message_text} >{message.content}</Text>
+                          <Text style={styles.each_message_time} >{message.time}</Text>
+                        </View>
+                      );
+                    }
+                  }
+                })
+              }
+              <View style={styles.} ></View>
+            </Animated.ScrollView>
+            <Animated.View style={[styles.messageInputWrapper, {bottom: this.keyboardHeight}]} 
+              onLayout={(event) => {
+                this.setState({"messageInputWrapperHeight": event.nativeEvent.layout.height + 25}); 
+              }} >
+              <TextInput style={styles.messageInput} placeholder="Mesajınızı yazın" value={this.state.messageContent} onChangeText={(content) => { this.setState({messageContent: content})}} ref="_messageInput" ></TextInput>
+              <TouchableOpacity style={styles.messageSendButton}  onPress={() => {this.onNewMessageSend()}} >
+                <Image source={require('./../../assets/send-icon.png')} style={styles.sendIcon} ></Image>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+          :
+          <View style={styles.content} ></View>
+        }
       </View>
     );
   }
@@ -307,6 +322,9 @@ const styles = StyleSheet.create({
   },
   each_day: {
     fontSize: 15, fontWeight: "300", color: "rgb(112, 112, 112)"
+  },
+  empty_message: {
+    height: 20, width: 100
   },
   each_message_wrapper_user: {
     maxWidth: "90%", alignItems: "flex-end",

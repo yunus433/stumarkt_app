@@ -7,6 +7,55 @@ export default class Loading extends Component{
     header: null
   };
 
+  addNotificationStatusToAsyncStorage = async (status) => {
+    try {
+      await AsyncStorage.setItem('notificationPermissionStatus', status);
+    } catch (error) {
+      alert("An unknown error occured, please try again.");
+    }
+  }
+
+  sendUserNotificationToken = async () => {
+    const token = await Notifications.getExpoPushTokenAsync();
+    await this.addNotificationStatusToAsyncStorage("allowed");
+    
+    fetch("https://stumarkt.herokuapp.com/api/notifications", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x_auth": API_KEY
+      },
+      body: JSON.stringify({
+        "id": this.state.user._id,
+        "token": token
+      })
+    })
+    .then(response => {return response.json()})
+    .then(data => {
+      if (data && data.error)
+        return alert("Err: " + data.error);
+  
+      this.props.navigation.push('main', {"user": data.user});
+    })
+    .catch(err => {
+      return alert("Err: " + err);
+    });
+  }
+
+  getNotificationPermission = async () => {
+    const permission = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    if (permission.status !== 'granted') {
+        const newPermission = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+        if (newPermission.status === 'granted') {
+          this.sendUserNotificationToken();
+        } else {
+          this.addNotificationStatusToAsyncStorage("not allowed");
+        }
+    } else {
+      this.sendUserNotificationToken();
+    }
+  }
+
   componentDidMount = async () => {
     try {
       const email = await AsyncStorage.getItem('email');
@@ -24,9 +73,7 @@ export default class Loading extends Component{
               return this.props.navigation.push('login'); 
             
               if (data.user.notificationToken == null) {
-                await AsyncStorage.removeItem('notificationPermissionStatus');
-
-                this.props.navigation.push('main', {"user": data.user});
+                this.getNotificationPermission();
               } else {
                 this.props.navigation.push('main', {"user": data.user});
               }
