@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { AppRegistry, Text, View, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView} from 'react-native';
+import { AppRegistry, Text, View, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView, Alert} from 'react-native';
 import { API_KEY } from 'react-native-dotenv'
 
 import Header from './../partials/header';
@@ -21,7 +21,8 @@ export default class SellDetails extends Component{
       price: '',
       otherPrice: '',
       city: '',
-      town: ''
+      town: '',
+      clickable: true
     };
   };
 
@@ -57,33 +58,59 @@ export default class SellDetails extends Component{
   }
 
   editProductButtonController = () => {
-    fetch('https://stumarkt.herokuapp.com/api/editProduct', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x_auth": API_KEY
-      },
-      body: JSON.stringify({
-        "id": this.state.product._id,
-        "name": this.state.name,
-        "description": this.state.description,
-        "price": this.state.price,
-        "city": this.state.city,
-        "town": this.state.town
+    if (this.state.name && this.state.description && this.state.price && this.state.city && this.state.town) {
+      this.setState({clickable: false});
+      fetch('https://stumarkt.herokuapp.com/api/editProduct', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x_auth": API_KEY
+        },
+        body: JSON.stringify({
+          "id": this.state.product._id,
+          "name": this.state.name,
+          "description": this.state.description,
+          "price": this.state.price,
+          "city": this.state.city,
+          "town": this.state.town
+        })
       })
-    })
-      .then(response => {return response.json()})
-      .then(data => {
-        if (data.error) return alert("Err: " + data.error);
+        .then(response => {return response.json()})
+        .then(data => {
+          if (data.error) {
+            this.setState({clickable: true});
+            return alert("Err: " + data.error);
+          }
+  
+          this.props.navigation.push('sellDetails', {
+            "user": this.state.user,
+            "productId": data.product._id
+          });
+        })
+        .catch(err => {
+          this.setState({clickable: true});
+          alert("Err: " + err);
+        })
+    } else {
+      return alert("Lütfen gerekli tüm bilgileri girin.");
+    }
+  }
 
-        this.props.navigation.push('sellDetails', {
-          "user": this.state.user,
-          "productId": data.product._id
-        });
-      })
-      .catch(err => {
-        alert("Err: " + err);
-      })
+  markedAsSoldConfirmationAlert = () => {
+    return (
+      Alert.alert(
+        this.state.product.name,
+        "Bu ürünü satıldı olarak işaretlemek istediğinize emin misiniz?",
+        [
+          {
+            text: "Vazgeç",
+            style: "cancel"
+          },
+          { text: "Satıldı Olarak İşaretle", onPress: () => this.markProductAsSoldButtonController() }
+        ],
+        { cancelable: false }
+      )
+    );
   }
 
   markProductAsSoldButtonController = () => {
@@ -95,10 +122,11 @@ export default class SellDetails extends Component{
       },
       body: JSON.stringify({
         "id": this.state.product._id,
-        "name": this.state.name,
-        "description": this.state.description,
-        "price": "SOLD",
-        "location": this.state.address
+        "name": this.state.product.name,
+        "description": this.state.product.description,
+        "price": "SATILDI",
+        "city": this.state.product.city,
+        "town": this.state.product.town
       })
     })
       .then(response => {return response.json()})
@@ -115,6 +143,23 @@ export default class SellDetails extends Component{
       })
   };
 
+  deleteConfirmationAlert = () => {
+    return (
+      Alert.alert(
+        this.state.product.name,
+        "Bu ürünü silmek istediğinize emin misiniz?",
+        [
+          {
+            text: "Vazgeç",
+            style: "cancel"
+          },
+          { text: "Sil", onPress: () => this.deleteProductButtonController() }
+        ],
+        { cancelable: false }
+      )
+    );
+  }
+
   deleteProductButtonController = () => {
     fetch('https://stumarkt.herokuapp.com/api/editProduct', {
       method: "POST",
@@ -130,7 +175,7 @@ export default class SellDetails extends Component{
       .then(response => {return response.json()})
       .then(data => {
         if (data.error) return alert("Err: " + data.error);
-        if (!data.success) return alert("An unknown error occured");
+        if (!data.success) return alert("Bilinmeyen bir hata oluştu, lütfen tekrar deneyin.");
 
         this.props.navigation.push('sellDashboard', {
           "user": this.state.user
@@ -151,10 +196,10 @@ export default class SellDetails extends Component{
               <View style={styles.mainInnerWrapper} >
                 <Text style={styles.contentTitle} >Ürünü Düzenle</Text>
                 <View style={styles.productOptionsWrapper} >
-                  <TouchableOpacity style={styles.productOptionButton} onPress={() => {this.deleteProductButtonController()}} >
+                  <TouchableOpacity style={styles.productOptionButton} onPress={() => {this.deleteConfirmationAlert()}} >
                     <Text style={styles.productOptionText} >Ürünü Sil</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.productOptionButton} onPress={() => {this.markProductAsSoldButtonController()}} >
+                  <TouchableOpacity style={styles.productOptionButton} onPress={() => {this.markedAsSoldConfirmationAlert()}} >
                     <Text style={styles.productOptionText} >Ürünü Satıldı Olarak İşaretle</Text>
                   </TouchableOpacity>
                 </View>
@@ -175,7 +220,7 @@ export default class SellDetails extends Component{
                 <Text style={styles.contentTitle} >Ürün Fiyatı</Text>
                 <View style={styles.priceWrapper} >
                   <TouchableOpacity onPress={() => this.priceInput(this.state.otherPrice)} style={styles.eachPriceWrapper} >
-                      <View style={ this.state.price != "free" && this.state.otherPrice ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
+                      <View style={ this.state.price != "ücretsiz" && this.state.otherPrice ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
                       <TextInput 
                         placeholder="Fiyat (₺)" 
                         onChangeText={(price) => {this.priceInput(price)}} 
@@ -183,8 +228,8 @@ export default class SellDetails extends Component{
                       {this.state.otherPrice}
                       </TextInput>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.priceInput("free")} style={styles.eachPriceWrapper} >
-                    <View style={ this.state.price == "free" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
+                  <TouchableOpacity onPress={() => this.priceInput("ücretsiz")} style={styles.eachPriceWrapper} >
+                    <View style={ this.state.price == "ücretsiz" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
                     <Text style={styles.eachPriceText} >Hediye Ürün (ücretsiz)</Text>
                   </TouchableOpacity>
                 </View>
@@ -213,9 +258,13 @@ export default class SellDetails extends Component{
                     <Text style={styles.agreementLink} >Gizlilik Sözleşmesi</Text>
                   </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.sendButton} onPress={() => {this.editProductButtonController()}} >
-                  <Text style={styles.sendButtonText} >Düzenle</Text>
-                </TouchableOpacity>
+                { this.state.clickable ?
+                  <TouchableOpacity style={styles.sendButton} onPress={() => {this.editProductButtonController()}} >
+                    <Text style={styles.sendButtonText} >Düzenle</Text>
+                  </TouchableOpacity>
+                  :
+                  <ActivityIndicator style={{marginBottom: 20}} size="large" color="rgb(255, 67, 148)" ></ActivityIndicator>
+                }
               </View>
               :
               <View style={styles.mainInnerWrapper} >
@@ -322,6 +371,21 @@ const styles = StyleSheet.create({
     padding: 10,
     borderColor: "rgb(236, 235, 235)", borderWidth: 2, borderRadius: 15,
     marginTop: 10, marginBottom: 20,
+    backgroundColor: "rgb(248, 248, 248)"
+  },
+  addressInputOne: {
+    flex: 1,
+    color: "rgb(112, 112, 112)", fontSize: 20, fontWeight: "300",
+    padding: 10,
+    borderColor: "rgb(236, 235, 235)", borderWidth: 2, borderRadius: 15,
+    backgroundColor: "rgb(248, 248, 248)"
+  },
+  addressInputTwo: {
+    flex: 2,
+    color: "rgb(112, 112, 112)", fontSize: 20, fontWeight: "300",
+    padding: 10,
+    borderColor: "rgb(236, 235, 235)", borderWidth: 2, borderRadius: 15,
+    marginLeft: 3,
     backgroundColor: "rgb(248, 248, 248)"
   },
   agreementWrapper: {

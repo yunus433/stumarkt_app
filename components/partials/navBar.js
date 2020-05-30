@@ -11,7 +11,24 @@ export default class NavBar extends Component{
   };
 
   navigateController = (page) => {
-    fetch("https://stumarkt.herokuapp.com/api/users?id=" + this.state.user._id, {
+    if (page == 'main' && this.props.buyPage) {
+      fetch("https://stumarkt.herokuapp.com/api/users?id=" + this.state.user._id, {
+        headers: {
+          "x_auth": API_KEY
+        }
+      })
+      .then(response => {return response.json()})
+      .then(data => {
+        if (data.error)
+          this.props.navigation.push('login');
+
+          this.props.navigation.goBack();
+      })
+      .catch(err => {
+        this.props.navigation.push('login');
+      });
+    } else {
+      fetch("https://stumarkt.herokuapp.com/api/users?id=" + this.state.user._id, {
         headers: {
           "x_auth": API_KEY
         }
@@ -26,6 +43,7 @@ export default class NavBar extends Component{
       .catch(err => {
         this.props.navigation.push('login');
       });
+    }
   }
 
   render() {
@@ -39,7 +57,7 @@ export default class NavBar extends Component{
           }
         </TouchableOpacity>
         <TouchableOpacity style={styles.messagesPageNavButton} onPress={() => {this.navigateController('messageDashboard')}} >
-          { this.state.user.notReadMessage > 0 ?
+          {/* { this.state.user.notReadMessage > 0 ?
             this.props.pageName == "message" ?
               <View style={styles.notReadMessageSelected} >
                 <Text style={styles.notReadMessageText} >{this.state.user.notReadMessage}</Text>
@@ -50,7 +68,7 @@ export default class NavBar extends Component{
               </View>
             :
             <View></View>
-          }
+          } */}
           { this.props.pageName == "message" ? 
             <Image source={require('./../../assets/messages-page-nav-icon-selected.png')} style={styles.navButtonImage} ></Image>
             :

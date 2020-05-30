@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
 import {AsyncStorage, AppRegistry, Text, View, StyleSheet, Image, TouchableOpacity, ScrollView} from 'react-native';
 import { API_KEY } from 'react-native-dotenv';
-import { Notifications } from 'expo';
-import * as Permissions from 'expo-permissions';
 
 import Header from './../partials/header';
 import NavBar from './../partials/navBar';

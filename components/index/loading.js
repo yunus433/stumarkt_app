@@ -1,58 +1,55 @@
 import React, {Component} from 'react';
 import {AsyncStorage, AppRegistry, View, ActivityIndicator, StyleSheet} from 'react-native';
-import { API_KEY } from 'react-native-dotenv'
+import { API_KEY } from 'react-native-dotenv';
+import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
 
 export default class Loading extends Component{
   static navigationOptions = {
     header: null
   };
 
-  addNotificationStatusToAsyncStorage = async (status) => {
+  sendUserNotificationToken = async (user) => {
     try {
-      await AsyncStorage.setItem('notificationPermissionStatus', status);
-    } catch (error) {
-      alert("An unknown error occured, please try again.");
+      const token = await Notifications.getExpoPushTokenAsync();
+
+      fetch("https://stumarkt.herokuapp.com/api/notifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x_auth": API_KEY
+        },
+        body: JSON.stringify({
+          "id": user._id.toString(),
+          "token": token
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.error)
+          alert("Err: " + data.error);
+    
+        this.props.navigation.push('main', {"user": user});
+      })
+      .catch(err => {
+        this.props.navigation.push('main', {"user": user});
+      });
+    } catch (err) {
+      this.props.navigation.push('main', {"user": user});
     }
   }
 
-  sendUserNotificationToken = async () => {
-    const token = await Notifications.getExpoPushTokenAsync();
-    await this.addNotificationStatusToAsyncStorage("allowed");
-    
-    fetch("https://stumarkt.herokuapp.com/api/notifications", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x_auth": API_KEY
-      },
-      body: JSON.stringify({
-        "id": this.state.user._id,
-        "token": token
-      })
-    })
-    .then(response => {return response.json()})
-    .then(data => {
-      if (data && data.error)
-        return alert("Err: " + data.error);
-  
-      this.props.navigation.push('main', {"user": data.user});
-    })
-    .catch(err => {
-      return alert("Err: " + err);
-    });
-  }
-
-  getNotificationPermission = async () => {
+  getNotificationPermission = async (user) => {
     const permission = await Permissions.getAsync(Permissions.NOTIFICATIONS);
     if (permission.status !== 'granted') {
         const newPermission = await Permissions.askAsync(Permissions.NOTIFICATIONS);
         if (newPermission.status === 'granted') {
-          this.sendUserNotificationToken();
+          this.sendUserNotificationToken(user);
         } else {
-          this.addNotificationStatusToAsyncStorage("not allowed");
+          this.props.navigation.push('main', {"user": user});
         }
     } else {
-      this.sendUserNotificationToken();
+      this.sendUserNotificationToken(user);
     }
   }
 
@@ -73,13 +70,12 @@ export default class Loading extends Component{
               return this.props.navigation.push('login'); 
             
               if (data.user.notificationToken == null) {
-                this.getNotificationPermission();
+                this.getNotificationPermission(data.user);
               } else {
                 this.props.navigation.push('main', {"user": data.user});
               }
           })
           .catch(err => {
-            console.log(err);
             this.props.navigation.push('login');
           });
       } else {

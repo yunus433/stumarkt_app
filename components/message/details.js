@@ -33,14 +33,6 @@ export default class MessageDetails extends Component{
     this.scrollView = React.createRef();
     this.keyboardHeight = new Animated.Value(20);
     this.messagesWrapperMarginBottom = new Animated.Value(0);
-
-    if (Platform.OS == "ios") {
-      this.keyboardWillShowSub = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
-      this.keyboardWillHideSub = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
-    } else {
-      this.keyboardWillShowSub = Keyboard.addListener('keyboardDidShow', this.keyboardWillShow);
-      this.keyboardWillHideSub = Keyboard.addListener('keyboardDidHide', this.keyboardWillHide);
-    }
   };
 
   componentWillUnmount() {
@@ -64,32 +56,63 @@ export default class MessageDetails extends Component{
   keyboardWillShow = (event) => {
     this.setState({"clicked": true});
 
-    Animated.parallel([
-      Animated.timing(this.keyboardHeight, {
-        duration: (Platform.OS == "ios" ? event.duration : 0),
-        toValue: event.endCoordinates.height + 10,
-      }),
-      Animated.timing(this.messagesWrapperMarginBottom, {
-        duration: (Platform.OS == "ios" ? event.duration : 0),
-        toValue: event.endCoordinates.height + this.state.messageInputWrapperHeight,
-      })
-    ]).start();
-    setTimeout(() => {
-      this.scrollView.current._component.scrollToEnd({animated: Platform.OS == "ios"});
-    }, (Platform.OS == "ios" ? event.duration + 100 : 100));
+    if (Platform.OS == "ios") {
+      Animated.parallel([
+        Animated.timing(this.keyboardHeight, {
+          duration: event.duration,
+          toValue: event.endCoordinates.height + 10,
+        }),
+        Animated.timing(this.messagesWrapperMarginBottom, {
+          duration: event.duration,
+          toValue: event.endCoordinates.height + this.state.messageInputWrapperHeight,
+        })
+      ]).start();
+
+      setTimeout(() => {
+        this.scrollView.current._component.scrollToEnd({animated: false});
+      }, event.duration + 10);
+    } else {
+      Animated.parallel([
+        Animated.timing(this.keyboardHeight, {
+          duration: 0,
+          toValue: event.endCoordinates.height + 10,
+        }),
+        Animated.timing(this.messagesWrapperMarginBottom, {
+          duration: 0,
+          toValue: event.endCoordinates.height + this.state.messageInputWrapperHeight,
+        })
+      ]).start();
+
+      setTimeout(() => {
+        this.scrollView.current._component.scrollToEnd({animated: true});
+      }, 10);
+    }
   };
 
   keyboardWillHide = (event) => {
-    Animated.parallel([
-      Animated.timing(this.keyboardHeight, {
-        duration: (Platform.OS == "ios" ? event.duration : 0),
-        toValue: 20,
-      }),
-      Animated.timing(this.messagesWrapperMarginBottom, {
-        duration: (Platform.OS == "ios" ? event.duration : 0),
-        toValue: this.state.messageInputWrapperHeight
-      })
-    ]).start();
+    if (Platform.OS == "ios") {
+      Animated.parallel([
+        Animated.timing(this.keyboardHeight, {
+          duration: event.duration,
+          toValue: 20,
+        }),
+        Animated.timing(this.messagesWrapperMarginBottom, {
+          duration: event.duration,
+          toValue: this.state.messageInputWrapperHeight
+        })
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(this.keyboardHeight, {
+          duration: 0,
+          toValue: 20,
+        }),
+        Animated.timing(this.messagesWrapperMarginBottom, {
+          duration: 0,
+          toValue: this.state.messageInputWrapperHeight
+        })
+      ]).start();
+    }
   };
 
   get_content = () => {
@@ -112,6 +135,49 @@ export default class MessageDetails extends Component{
       });
   }
 
+  // componentWillMount () {
+  //   this.get_content();
+
+  //   this.keyboardWillShowSub = Keyboard.addListener('keyboardDidShow', this.keyboardWillShow);
+  //   this.keyboardWillHideSub = Keyboard.addListener('keyboardDidHide', this.keyboardWillHide);
+  // };
+
+  // componentWillUnmount() {
+  //   this.keyboardWillShowSub.remove();
+  //   this.keyboardWillHideSub.remove();
+  // }
+
+  // keyboardWillShow = (event) => {
+  //   this.setState({"clicked": true});
+
+  //   Animated.parallel([
+  //     Animated.timing(this.keyboardHeight, {
+  //       duration: 0,
+  //       toValue: event.endCoordinates.height + 10,
+  //     }),
+  //     Animated.timing(this.messagesWrapperMarginBottom, {
+  //       duration: 0,
+  //       toValue: event.endCoordinates.height + this.state.messageInputWrapperHeight,
+  //     })
+  //   ]).start();
+  //   setTimeout(() => {
+  //     this.scrollView.current._component.scrollToEnd({animated: true});
+  //   }, 10);
+  // };
+
+  // keyboardWillHide = (event) => {
+  //   Animated.parallel([
+  //     Animated.timing(this.keyboardHeight, {
+  //       duration: 0,
+  //       toValue: 20,
+  //     }),
+  //     Animated.timing(this.messagesWrapperMarginBottom, {
+  //       duration: 0,
+  //       toValue: this.state.messageInputWrapperHeight
+  //     })
+  //   ]).start();
+  // };
+
   componentDidMount = () => {
     const socket = socketIO('https://stumarkt.herokuapp.com');
     
@@ -121,17 +187,19 @@ export default class MessageDetails extends Component{
       this.socket = socket;
       
       socket.emit('join', {
-        room: this.state.user._id
+        room: this.state.chat_id.toString()
       });
 
       socket.on('newMessage', params => {
-        this.setState((state) => {
-          const messagesArr = state.messages.concat(params.message);
-  
-          return {
-            "messages": messagesArr
-          }
-        })
+        if (!this.state.messages.length || this.state.messages[this.state.messages.length-1]._id != params.message._id) {
+          this.setState((state) => {
+            const messagesArr = state.messages.concat(params.message);
+    
+            return {
+              "messages": messagesArr
+            }
+          });
+        }
       });
     });
 
@@ -141,6 +209,13 @@ export default class MessageDetails extends Component{
       this.refs._messageInput.focus();
     }
 
+    if (Platform.OS == "ios") {
+      this.keyboardWillShowSub = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
+      this.keyboardWillHideSub = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
+    } else {
+      this.keyboardWillShowSub = Keyboard.addListener('keyboardDidShow', this.keyboardWillShow);
+      this.keyboardWillHideSub = Keyboard.addListener('keyboardDidHide', this.keyboardWillHide);
+    }
   };
 
   onNewMessageSend = () => {
@@ -267,7 +342,7 @@ export default class MessageDetails extends Component{
                   }
                 })
               }
-              <View style={styles.} ></View>
+              <View style={styles.empty_message} ></View>
             </Animated.ScrollView>
             <Animated.View style={[styles.messageInputWrapper, {bottom: this.keyboardHeight}]} 
               onLayout={(event) => {
@@ -355,7 +430,7 @@ const styles = StyleSheet.create({
     marginTop: 3
   },
   messageInputWrapper: {
-    position: "absolute", width: "96%", height: "10%",
+    position: "absolute", width: "96%", height: 80,
     backgroundColor: "white",
     flexDirection: "row", alignItems: "center",
     marginLeft: "2%", marginRight: "2%",

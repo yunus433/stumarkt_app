@@ -86,14 +86,9 @@ export default class BuyDetails extends Component{
           },
           body: JSON.stringify({
             "buyer": this.state.user._id,
-            "buyerName": this.state.user.name,
             "owner": data.user._id,
-            "ownerName": data.user.name,
             "product": this.state.product._id,
-            "productName": this.state.product.name,
-            "productPhoto": this.state.product.productPhotoArray[0],
-            "content": this.state.message,
-            "createdAt": Date.now(),
+            "content": this.state.message
           })
         })
           .then(response => {return response.json()})
@@ -103,10 +98,7 @@ export default class BuyDetails extends Component{
 
             this.props.navigation.push('messageDetails', {
               "user": this.state.user,
-              "buyer": this.state.user,
-              "owner": data.user,
-              "product": this.state.product,
-              "messagesOf": "buyer"
+              "id": data.id
             });
           })
           .catch(err => {
@@ -219,7 +211,7 @@ export default class BuyDetails extends Component{
             </View>
           </ScrollView>
         </View>
-        <NavBar navigation={this.props.navigation} pageName="main" ></NavBar>
+        <NavBar navigation={this.props.navigation} pageName="main" buyPage={true} ></NavBar>
       </View>
     );
   }

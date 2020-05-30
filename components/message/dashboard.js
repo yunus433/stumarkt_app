@@ -20,8 +20,8 @@ export default class MessageDetails extends Component{
     };
   };
 
-  getAllMessages = () => {
-    fetch(`https://stumarkt.herokuapp.com/api/messages?buyer=${this.state.user._id}`, {
+  get_content = () => {
+    fetch(`https://stumarkt.herokuapp.com/api/messages?id=${this.state.user._id}`, {
       headers: {
         "x_auth": API_KEY
       }
@@ -29,28 +29,11 @@ export default class MessageDetails extends Component{
     .then(result => result.json())
     .then(data => {
       if (data.error) 
-        return alert(data.error);
+        return alert(data.error)
       
-      this.setState({
-        "buyerMessages": data.messages
-      });
-    })
-    .catch(err => {
-      alert("Error: " + err)
-    });
-
-    fetch(`https://stumarkt.herokuapp.com/api/messages?owner=${this.state.user._id}`, {
-      headers: {
-        "x_auth": API_KEY
-      }
-    })
-    .then(result => result.json())
-    .then(data => {
-      if (data.error) 
-        return alert(data.error);
-
-      this.setState({
-        "ownerMessages": data.messages
+      return this.setState({
+        "buyerMessages": data.buyerMessages,
+        "ownerMessages": data.ownerMessages
       });
     })
     .catch(err => {
@@ -58,82 +41,15 @@ export default class MessageDetails extends Component{
     });
   }
 
-  messageDetailsButtonController = (messagesOf, buyerId, productId) => {
-    if (messagesOf == "buyer") {
-      fetch(`https://stumarkt.herokuapp.com/api/products?id=${productId}`, {
-        headers: {
-          "x_auth": API_KEY
-        }
-      })
-        .then(response => {return response.json()})
-        .then(data => {
-          if (data.error) return alert("Err: " + data.error);
-
-          fetch('https://stumarkt.herokuapp.com/api/users?id=' + data.product.owner, {
-            headers: {
-              "x_auth": API_KEY
-            }
-          })
-            .then(response => {return response.json()})
-            .then(userData => {
-              if (userData.error) return alert("Err: " + userData.error);
-
-              this.props.navigation.push('messageDetails', {
-                "user": this.state.user,
-                "buyer": this.state.user,
-                "owner": userData.user,
-                "product": data.product,
-                messagesOf
-              })
-            })
-            .catch((err) => {
-              return alert("Err: " + err);
-            })
-        })
-        .catch((err) => {
-          return alert("Err: " + err);
-        })
-    } else if (messagesOf == "owner") {
-      fetch(`https://stumarkt.herokuapp.com/api/products?id=${productId}`, {
-        headers: {
-          "x_auth": API_KEY
-        }
-      })
-        .then(response => {return response.json()})
-        .then(data => {
-          if (data.error) return alert("Err: " + data.error);
-
-          fetch('https://stumarkt.herokuapp.com/api/users?id=' + buyerId, {
-            headers: {
-              "x_auth": API_KEY
-            }
-          })
-            .then(response => {return response.json()})
-            .then(userData => {
-              if (userData.error) return alert("Err: " + userData.error);
-
-              this.props.navigation.push('messageDetails', {
-                "user": this.state.user,
-                "buyer": userData.user,
-                "owner": this.state.user,
-                "product": data.product,
-                messagesOf
-              })
-            })
-            .catch((err) => {
-              return alert("Err: " + err);
-            })
-        })
-        .catch((err) => {
-          return alert("Err: " + err);
-        })
-    } else {
-      alert("Err: An unknown error occured");
-    }
+  message_details_controller = (id) => {
+    this.props.navigation.push('messageDetails', {
+      "user": this.state.user,
+      "id": id,
+    });
   }
 
   componentDidMount = () => {
-    this.getAllMessages();
+    this.get_content();
   }
 
   render() {
@@ -153,24 +69,24 @@ export default class MessageDetails extends Component{
             <ScrollView style={{flex: 1}} >
               { this.state.messagesOn == "buyerMessages" ?
                 this.state.buyerMessages.length ?
-                this.state.buyerMessages.map((message, key) => {
-                  return (
-                    <TouchableOpacity key={key} style={styles.eachMessageWrapper} onPress={() => {this.messageDetailsButtonController("buyer", message.buyer, message.product)}} >
-                      <Image style={styles.eachMessageProductImage} source={{uri: message.productPhoto}} ></Image>
-                      <View style={styles.eachMessageContentWrapper} >
-                        <Text style={styles.eachMessageProductName} >{message.productName}</Text>
-                        <View style={{flexDirection: "row"}} >
-                          <Text style={styles.eachMessageUserName} >{message.ownerName} - </Text>
-                          <Text style={styles.eachMessageTotalNumber} >{message.messages.length} mesaj</Text>
+                  this.state.buyerMessages.map((chat, key) => {
+                    return (
+                      <TouchableOpacity key={key} style={styles.eachMessageWrapper} onPress={() => {this.message_details_controller(chat._id.toString())}} >
+                        <Image style={styles.eachMessageProductImage} source={{uri: chat.product.productPhotoArray[0]}} ></Image>
+                        <View style={styles.eachMessageContentWrapper} >
+                          <Text style={styles.eachMessageProductName} >{chat.product.productName}</Text>
+                          <View style={{flexDirection: "row"}} >
+                            <Text style={styles.eachMessageUserName} >{chat.owner.name} - </Text>
+                            <Text style={styles.eachMessageTotalNumber} >{chat.messages.length} mesaj</Text>
+                          </View>
                         </View>
-                      </View>
-                      { message.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == 'owner'}).length ? 
-                        <View style={styles.notReadMessageNumberWrapper} >
-                          <Text style={styles.notReadMessageNumber} >{message.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == 'owner'}).length}</Text>
-                        </View> 
-                        :
-                        null }
-                    </TouchableOpacity>
+                        { chat.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == chat.owner._id.toString()}).length ? 
+                          <View style={styles.notReadMessageNumberWrapper} >
+                            <Text style={styles.notReadMessageNumber} >{chat.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == chat.owner._id.toString()}).length}</Text>
+                          </View> 
+                          :
+                          null }
+                      </TouchableOpacity>
                   )})
                   :
                   <View style={styles.noMessageWrapper} >
@@ -178,24 +94,24 @@ export default class MessageDetails extends Component{
                   </View>
                 :
                 this.state.ownerMessages.length ?
-                this.state.ownerMessages.map((message, key) => {
-                  return (
-                    <TouchableOpacity key={key} style={styles.eachMessageWrapper} onPress={() => {this.messageDetailsButtonController("owner", message.buyer, message.product)}} >
-                      <Image style={styles.eachMessageProductImage} source={{uri: message.productPhoto}} ></Image>
-                      <View style={styles.eachMessageContentWrapper} >
-                        <Text style={styles.eachMessageProductName} >{message.productName}</Text>
-                        <View style={{flexDirection: "row"}} >
-                          <Text style={styles.eachMessageUserName} >{message.buyerName} - </Text>
-                          <Text style={styles.eachMessageTotalNumber} >{message.messages.length} mesaj</Text>
+                  this.state.ownerMessages.map((chat, key) => {
+                    return (
+                      <TouchableOpacity key={key} style={styles.eachMessageWrapper} onPress={() => {this.message_details_controller(chat._id.toString())}} >
+                        <Image style={styles.eachMessageProductImage} source={{uri: chat.product.productPhotoArray[0]}} ></Image>
+                        <View style={styles.eachMessageContentWrapper} >
+                          <Text style={styles.eachMessageProductName} >{chat.product.productName}</Text>
+                          <View style={{flexDirection: "row"}} >
+                            <Text style={styles.eachMessageUserName} >{chat.buyer.name} - </Text>
+                            <Text style={styles.eachMessageTotalNumber} >{chat.messages.length} mesaj</Text>
+                          </View>
                         </View>
-                      </View>
-                      { message.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == 'buyer'}).length ? 
-                        <View style={styles.notReadMessageNumberWrapper} >
-                          <Text style={styles.notReadMessageNumber} >{message.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == 'buyer'}).length}</Text>
-                        </View> 
-                        :
-                        null }
-                    </TouchableOpacity>
+                        { chat.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == chat.buyer._id.toString()}).length ? 
+                          <View style={styles.notReadMessageNumberWrapper} >
+                            <Text style={styles.notReadMessageNumber} >{chat.messages.filter(eachMessage => {return !eachMessage.read && eachMessage.sendedBy == chat.buyer._id.toString()}).length}</Text>
+                          </View> 
+                          :
+                          null }
+                      </TouchableOpacity>
                   )})
                   :
                   <View style={styles.noMessageWrapper} >

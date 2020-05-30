@@ -27,7 +27,8 @@ export default class New extends Component{
       otherPrice: '',
       city: '',
       town: '',
-      completed: false
+      completed: false,
+      clickable: true
     };
   }
 
@@ -49,12 +50,9 @@ export default class New extends Component{
       });
   }
 
-  getCityEngName = (city) => {
-    return city.toLocaleLowerCase().replace("ş", "s").replace("ı", "i").replace("ö", "o").replace("ç", "c").replace("ü", "u").replace("ğ", "g");
-  }
-
   sendNewProductButton = () => {
-    if (this.state.category && this.state.name && this.state.description && this.state.price && this.state.city && this.state.town) {
+    if (this.state.category && this.state.name && this.state.description && this.state.price && this.state.city && this.state.town && this.state.clickable) {
+      this.setState({clickable: false});
       fetch("https://stumarkt.herokuapp.com/api/newProduct", {
         method: "POST",
         headers: {
@@ -65,22 +63,27 @@ export default class New extends Component{
           "category": this.state.category,
           "name": this.state.name,
           "description": this.state.description,
-          "price": this.state.price + "₺",
-          "city": this.getCityEngName(this.state.city),
+          "price": this.state.price,
+          "city": this.state.city,
           "town": this.state.town,
           "userId": this.state.user._id.toString(),
           "university": this.state.user.university,
           "productPhotoNameArray": this.state.productPhotoNameArray
         })
       })
-      .then(response => {response.json()})
+      .then(response => response.json())
       .then(data => {
-        if (data && data.error)
+        if (data && data.error) {
+          this.setState({clickable: true});
           return alert("Err: " + data.error);
+        }
 
-        this.props.navigation.push('sellDashboard', {"user": this.state.user});
+        setTimeout(() => {
+          this.props.navigation.push('sellDashboard', {"user": this.state.user});
+        }, 500);
       })
       .catch(err => {
+        this.setState({clickable: true});
         return alert("Err: " + err);
       });
     } else {
@@ -477,42 +480,46 @@ export default class New extends Component{
                 <ScrollView style={styles.innnerContent} >
                   <View style={styles.sellWrapper} >
                     <Text style={styles.contentTitle} >Kategoriler:<Text style={styles.requiredItemSymbol} >* </Text> </Text>
-                    <View style={styles.categoryWrapper} > 
-                      <TouchableOpacity onPress={() => this.categoryInput("rented")} style={styles.eachCategoryWrapper} >
-                        <View style={ this.state.category == "rented" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Kiralık, Ev</Text>
+                    <View style={styles.categoryWrapper} >
+                      <TouchableOpacity onPress={() => this.categoryInput("book")} style={styles.eachCategoryWrapper} >
+                        <View style={ this.state.category == "book" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
+                        <Text style={styles.eachCategoryText} >Kitap</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={() => this.categoryInput("hobby")} style={styles.eachCategoryWrapper} >
-                        <View style={ this.state.category == "hobby" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Eğlence, Hobi</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={() => this.categoryInput("home")} style={styles.eachCategoryWrapper} >
-                        <View style={ this.state.category == "home" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Ev Eşyası, Mobilya</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={() => this.categoryInput("fashion")} style={styles.eachCategoryWrapper} >
-                        <View style={ this.state.category == "fashion" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Moda, Giyim</Text>
+                      <TouchableOpacity onPress={() => this.categoryInput("stationery")} style={styles.eachCategoryWrapper} >
+                        <View style={ this.state.category == "stationery" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
+                        <Text style={styles.eachCategoryText} >Kırtasiye</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.categoryInput("electronic")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.category == "electronic" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
                         <Text style={styles.eachCategoryText} >Elektronik</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={() => this.categoryInput("fun")} style={styles.eachCategoryWrapper} >
-                        <View style={ this.state.category == "fun" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Müzik, Film, Kitap</Text>
+                      <TouchableOpacity onPress={() => this.categoryInput("hobby")} style={styles.eachCategoryWrapper} >
+                        <View style={ this.state.category == "hobby" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
+                        <Text style={styles.eachCategoryText} >Eğlence, Hobi</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={() => this.categoryInput("tickets")} style={styles.eachCategoryWrapper} >
-                        <View style={ this.state.category == "tickets" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Bilet, Giriş Kartları</Text>
+                      <TouchableOpacity onPress={() => this.categoryInput("fashion")} style={styles.eachCategoryWrapper} >
+                        <View style={ this.state.category == "fashion" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
+                        <Text style={styles.eachCategoryText} >Moda, Giyim</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => this.categoryInput("lesson")} style={styles.eachCategoryWrapper} >
+                        <View style={ this.state.category == "lesson" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
+                        <Text style={styles.eachCategoryText} >Ders, Kurs</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.categoryInput("exchange")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.category == "exchange" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
                         <Text style={styles.eachCategoryText} >Hediye, Takas</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={() => this.categoryInput("lesson")} style={styles.eachCategoryWrapper} >
-                        <View style={ this.state.category == "lesson" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
-                        <Text style={styles.eachCategoryText} >Ders, Kurs</Text>
+                      <TouchableOpacity onPress={() => this.categoryInput("fun")} style={styles.eachCategoryWrapper} >
+                        <View style={ this.state.category == "fun" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
+                        <Text style={styles.eachCategoryText} >Müzik, Film</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => this.categoryInput("donation")} style={styles.eachCategoryWrapper} >
+                        <View style={ this.state.category == "donation" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
+                        <Text style={styles.eachCategoryText} >Bağış</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => this.categoryInput("rented")} style={styles.eachCategoryWrapper} >
+                        <View style={ this.state.category == "rented" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
+                        <Text style={styles.eachCategoryText} >Kiralık Ev</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => this.categoryInput("other")} style={styles.eachCategoryWrapper} >
                         <View style={ this.state.category == "other" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
@@ -553,7 +560,7 @@ export default class New extends Component{
                     <Text style={styles.contentTitle} >Fiyat<Text style={styles.requiredItemSymbol} >* </Text> </Text>
                     <View style={styles.priceWrapper} >
                       <TouchableOpacity onPress={() => this.priceInput(this.state.otherPrice)} style={styles.eachCategoryWrapper} >
-                        <View style={ this.state.price != "free" && this.state.otherPrice ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
+                        <View style={ this.state.price != "ücretsiz" && this.state.otherPrice ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
                         <TextInput 
                           placeholder="Fiyat (₺)" 
                           onChangeText={(price) => {this.priceInput(price)}} 
@@ -562,8 +569,8 @@ export default class New extends Component{
                         {this.state.otherPrice}
                         </TextInput>
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={() => this.priceInput("free")} style={styles.eachCategoryWrapper} >
-                        <View style={ this.state.price == "free" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
+                      <TouchableOpacity onPress={() => this.priceInput("ücretsiz")} style={styles.eachCategoryWrapper} >
+                        <View style={ this.state.price == "ücretsiz" ? styles.activatedRadioInput : styles.eachRadioInput} ></View>
                         <Text style={styles.eachCategoryText} >Hediye Et (ücretsiz)</Text>
                       </TouchableOpacity>
                     </View>
@@ -592,9 +599,13 @@ export default class New extends Component{
                         <Text style={styles.agreementLink} >Gizlilik Sözleşmesi</Text>
                       </TouchableOpacity>
                     </View>
-                    <TouchableOpacity style={styles.sendButton} onPress={() => {this.sendNewProductButton()}} >
-                      <Text style={styles.sendButtonText} >Ekle</Text>
-                    </ TouchableOpacity>
+                    { this.state.clickable ?
+                      <TouchableOpacity style={styles.sendButton} onPress={() => {this.sendNewProductButton()}} >
+                        <Text style={styles.sendButtonText} >Ekle</Text>
+                      </ TouchableOpacity>
+                      :
+                      <ActivityIndicator style={{marginBottom: 20}} size="large" color="rgb(255, 67, 148)" ></ActivityIndicator>
+                    }
                   </View>
                 </ScrollView>
               </View> 
@@ -650,14 +661,13 @@ const styles = StyleSheet.create({
   },
   innnerContent: {
     flex: 1,
-    padding: 20
+    padding: 20, marginBottom: 20
   },
   sellWrapper: {
     flex: 1,
     backgroundColor: "white",
     borderRadius: 15, borderColor: "rgb(236, 235, 235)", borderWidth: 2,
-    padding: 15,
-    marginBottom: 40
+    padding: 15, marginBottom: 100
   },
   contentTitle: {
     color: "rgb(112, 112, 112)", fontSize: 25, fontWeight: "300",
