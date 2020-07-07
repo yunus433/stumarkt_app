@@ -1,21 +1,27 @@
-import React, {Component} from 'react';
-import { AsyncStorage, AppRegistry, TouchableWithoutFeedback, Text, View, StyleSheet, TextInput, Image, TouchableOpacity, Keyboard} from 'react-native';
-import { API_KEY } from 'react-native-dotenv'
+import React, { Component } from 'react';
+import { AppRegistry } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Platform, TouchableOpacity, StatusBar, Image, Keyboard } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faKey, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
-export default class Login extends Component{
+const apiRequest = require('../../utils/apiRequest');
+
+const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 40 : StatusBar.currentHeight;
+
+export default class Login extends Component {
   static navigationOptions = {
     header: null
   };
-
+  
   constructor (props) {
     super(props);
-
     this.state = {
-      email: '',
-      password: '',
-      error: ''
+      email: "",
+      password: "",
+      error: ""
     };
-  }
+  };
 
   addUserToAsyncStorage = async (email, password, callback) => {
     try {
@@ -23,192 +29,115 @@ export default class Login extends Component{
       await AsyncStorage.setItem('password', password);
       callback();
     } catch (error) {
-      alert("Your account couldn't be saved. Please try again.")
+      alert("Hesabınız kaydedilemedi, lütfen daha sonra tekrar deneyin.");
     }
   };
 
-  onLoginPageSend() {
+  loginPostController = () => {
     Keyboard.dismiss();
-    if (this.state.email != '' && this.state.password != '' ) {
-      fetch("https://stumarkt.herokuapp.com/api/login?email=" + this.state.email + "&password=" + this.state.password, {
-        headers: {
-          "x_auth": API_KEY
-        }
-      })
-      .then(response => {return response.json()})
-      .then(data => {
-        if (data.error && data.error == "User not found") 
-          return this.setState({"error": "Üzgünüz, e-posta adresiniz yanlış."});
-        if (data.error)
-          return this.setState({"error": "Bilinmeyen bir hata oluştu."});
 
-        this.addUserToAsyncStorage(this.state.email, this.state.password, () => {
-          this.props.navigation.push('main', {"user": data.user});
-        });
-      })
-      .catch(err => {
-        return this.setState({"error": "Giriş yapmak için internet bağlantınız olmalı."});
+    if (!this.state.email || !this.state.password)
+      return this.setState({ error: "Lütfen tüm bilgileri girin." });
+
+    apiRequest({
+      method: "POST",
+      url: "/auth/login",
+      body: {
+        email: this.state.email,
+        password: this.state.password
+      }
+    }, (err, data) => {
+      if (err) return this.setState({ error: "Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin." });
+
+      if (data.error && data.error == 'bad request')
+        return this.setState({ error: "Lütfen tüm bilgileri girin." });
+
+      if (data.error && data.error == 'user not found')
+        return this.setState({ error: "E-Posta hesabınız ya da şifreniz yanlış." });
+
+      this.addUserToAsyncStorage(this.state.email, this.state.password, () => {
+        this.props.navigation.navigate('Index', { id: data.user._id });
       });
-    } else {
-      this.setState({
-        "error": "Lütfen e-posta adresinizi yazın."
-      });
-    }
+    });
   }
 
   render() {
     return (
-      <TouchableWithoutFeedback style={styles.mainWrapper}  onPress={() => {Keyboard.dismiss()}}>
-        <View style={styles.innerWrapper} >
-          <Image source={require('./../../assets/main-icon.png')} style={styles.logo} ></Image>
-          <View style={styles.formWrapper}>
-            <View style={styles.header} >
-              <Text style={styles.title} >
-                Giriş Yap
-              </Text>
-              {/* <TouchableOpacity style={styles.lostPasswordWrapper} >
-                <Text style={styles.lostPassword} > Passwort </Text>
-                <Text style={styles.lostPassword} > vergessen? </Text>
-              </TouchableOpacity> */}
-            </View>
-            <TextInput 
-              style={styles.emailInput}
-              placeholder="E-posta"
-              onChangeText={(email) => { this.setState({email: email})}}
-            >
-            </TextInput>
-            <TextInput
-              secureTextEntry={true}
-              style={styles.passwordInput}
-              placeholder="Şifre"
-              onChangeText={(password) => {this.setState({password: password})}}
-            >
-            </TextInput>
-            <TouchableOpacity
-              onPress={this.onLoginPageSend.bind(this)} 
-              style={styles.sendButton}
-            >
-              <Text style={styles.sendButtonText} >Giriş Yap</Text>
-            </ TouchableOpacity>
-            <View style={styles.errorLineWrapper} >
-              <Text style={styles.errorLine} > {this.state.error} </Text>
-            </View>
-          </View>
-          <View style={styles.bottomLink} >
-            <Text style={styles.bottomLinkInfo} >Üye değil misin?</Text>
-            <TouchableOpacity
-              onPress={() => {this.props.navigation.navigate('register')}} 
-            >
-              <Text style={styles.bottomLinkButton} >Hemen aramıza katıl!</Text>
-            </TouchableOpacity>
-          </View>
+      <View style={styles.main_wrapper} >
+        <Text style={styles.title} >Giriş Yap</Text>
+        <View style={styles.each_input_wrapper} >
+          <FontAwesomeIcon icon={faEnvelope} size={17} color="rgb(0, 0, 0)" />
+          <TextInput
+            placeholder="E-Posta"
+            style={styles.each_input}
+            onChangeText={text => {this.setState({ email: text })}}
+          >{this.state.email}</TextInput>
         </View>
-      </TouchableWithoutFeedback>
+        <View style={styles.each_input_wrapper} >
+          <FontAwesomeIcon icon={faKey} size={17} color="rgb(0, 0, 0)" />
+          <TextInput
+            placeholder="Şifre"
+            secureTextEntry={true}
+            style={styles.each_input}
+            onChangeText={text => {this.setState({ password: text })}}
+          >{this.state.password}</TextInput>
+        </View>
+        <Text style={styles.error_text} >{this.state.error}</Text>
+        <TouchableOpacity
+          style={styles.register}
+          onPress={() => {this.loginPostController()}}
+        >
+          <Text style={styles.register_text} >Giriş Yap</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.login}
+          onPress={() => {this.props.navigation.navigate('Register')}}
+        >
+          <Text style={styles.login_text} >Hesabın yok mu? Hemen üye ol!</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  mainWrapper: {
-    flex: 1,
-    justifyContent: "center", alignItems: "center",
-    backgroundColor: "rgb(248, 248, 248)", padding: 25
-  },
-  innerWrapper: {
-    flex: 1,
-    margin: 25, marginTop: "50%"
-  },
-  logo: {
-    height: 50,
-    width: 70,
-    resizeMode: "contain",
-    marginLeft: 20,
-    marginBottom: 10
-  },
-  formWrapper: {
-    backgroundColor: "white",
-    paddingLeft: 20,
-    paddingRight: 20,
-    paddingTop: 10,
-    paddingBottom: 10,
-    borderColor: "rgb(236, 236, 235)",
-    borderWidth: 2,
-    borderRadius: 5
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20
+  main_wrapper: {
+    flex: 1, paddingTop: STATUSBAR_HEIGHT,
+    backgroundColor: "rgb(253, 252, 252)"
   },
   title: {
-    fontSize: 25,
-    color: "rgb(112, 112, 112)",
-    fontWeight: "200",
-    flex: 3
+    marginTop: 10, color: "rgb(15, 15, 15)", fontWeight: "700",
+    width: "90%", alignSelf: "center", fontSize: 30
   },
-  lostPassword: {
-    color: "rgb(255, 61, 148)",
-    fontSize: 10
+  each_input_wrapper: {
+    flexDirection: "row", alignItems: "center",
+    marginTop: 20, width: "90%", alignSelf: "center",
+    borderColor: "rgb(236, 236, 236)", borderWidth: 2,
+    backgroundColor: "rgb(248, 248, 248)", paddingLeft: 15, paddingRight: 15, height: 50, borderRadius: 30
   },
-  lostPasswordWrapper: {
-    flex: 1,
-    alignItems: "flex-end"
+  each_input: {
+    color: "rgb(15, 15, 15)", fontSize: 17, fontWeight: "500",
+    marginLeft: 10, flex: 1
   },
-  emailInput: {
-    backgroundColor: "rgb(248, 248, 248)",
-    padding: 10,
-    borderColor: "rgb(236, 236, 235)",
-    borderWidth: 2,
-    borderRadius: 5,
-    color: "rgb(112, 112, 122)",
-    marginBottom: 15
+  error_text: {
+    marginTop: "auto", width: "90%", textAlign: "center",
+    fontSize: 16, color: "red", fontWeight: "500", alignSelf: "center"
   },
-  passwordInput: {
-    backgroundColor: "rgb(248, 248, 248)",
-    padding: 10,
-    borderColor: "rgb(236, 236, 235)",
-    borderWidth: 2,
-    borderRadius: 5,
-    color: "rgb(112, 112, 122)",
-    marginBottom: 15
+  register: {
+    justifyContent: "center", alignItems: "center",
+    backgroundColor: "rgb(88, 0, 232)", borderRadius: 20,
+    padding: 15, shadowColor: "rgb(0, 0, 0)", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5,
+    width: "90%", marginBottom: 15, marginTop: 15,
+    alignSelf: "center"
   },
-  sendButton: {
-    backgroundColor: "rgba(255, 108, 128, 0.3)",
-    borderColor: "rgba(255, 61, 148, 0.4)",
-    borderWidth: 2,
-    padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 5
+  register_text: {
+    color: "rgb(255, 255, 255)", fontSize: 22, fontWeight: "600"
   },
-  sendButtonText: {
-    color: "rgb(255, 61, 148)",
-    fontWeight: "700"
+  login: {
+    marginBottom: 60, alignSelf: "center"
   },
-  errorLineWrapper: {
-    flexDirection: "row",
-    marginTop: 10
-  },
-  errorLine: {
-    fontSize: 13,
-    color: "rgb(255, 61, 148)",
-    flex: 1,
-    textAlign: "center"
-  },
-  bottomLink: {
-    paddingLeft: 20,
-    marginTop: 10
-  },
-  bottomLinkInfo: {
-    color: "rgb(112, 112, 112)",
-    fontSize: 18,
-    marginBottom: 5
-  },
-  bottomLinkButton: {
-    color: "rgb(255, 61, 148)",
-    fontSize: 18,
-    fontWeight: "700"
+  login_text: {
+    color: "rgb(0, 0, 0)", fontSize: 17, fontWeight: "500",
   }
 });
 

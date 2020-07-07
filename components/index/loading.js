@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import {AsyncStorage, AppRegistry, View, ActivityIndicator, StyleSheet} from 'react-native';
-import { API_KEY } from 'react-native-dotenv';
-import { Notifications } from 'expo';
-import * as Permissions from 'expo-permissions';
+import {AppRegistry, View, ActivityIndicator, StyleSheet} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
+
+const apiRequest = require('../../utils/apiRequest');
 
 export default class Loading extends Component{
   static navigationOptions = {
@@ -13,29 +13,21 @@ export default class Loading extends Component{
     try {
       const token = await Notifications.getExpoPushTokenAsync();
 
-      fetch("https://stumarkt.herokuapp.com/api/notifications", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x_auth": API_KEY
-        },
-        body: JSON.stringify({
-          "id": user._id.toString(),
-          "token": token
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.error)
-          alert("Err: " + data.error);
-    
-        this.props.navigation.push('main', {"user": user});
-      })
-      .catch(err => {
-        this.props.navigation.push('main', {"user": user});
+      apiRequest({
+        method: 'POST',
+        url: '/notifications',
+        body: {
+          id:user._id.toString(),
+          token
+        }
+      }, (err, data) => {
+        if (err) alert(err);
+        if (data.error) alert(data.error);
+
+        this.props.navigation.navigate('Index', { id: user._id });
       });
     } catch (err) {
-      this.props.navigation.push('main', {"user": user});
+      this.props.navigation.navigate('Index', { id: user._id });
     }
   }
 
@@ -46,7 +38,7 @@ export default class Loading extends Component{
         if (newPermission.status === 'granted') {
           this.sendUserNotificationToken(user);
         } else {
-          this.props.navigation.push('main', {"user": user});
+          this.props.navigation.navigate('Index', { id: data.user._id });
         }
     } else {
       this.sendUserNotificationToken(user);
@@ -59,48 +51,40 @@ export default class Loading extends Component{
       const password = await AsyncStorage.getItem('password');
 
       if (email != null && password != null) {
-        await fetch("https://stumarkt.herokuapp.com/api/login?email=" + email + "&password=" + password, {
-          headers: {
-            "x_auth": API_KEY
+        apiRequest({
+          method: "POST",
+          url: "/auth/login",
+          body: { email, password }
+        }, (err, data) => {
+          if (err || !data || data.error || !data.user) return this.props.navigation.navigate('Landing');
+
+          if (data.user.notificationToken == null) {
+            this.getNotificationPermission(data.user);
+          } else {
+            this.props.navigation.navigate('Index', { id: data.user._id });
           }
-          })
-          .then(response => {return response.json()})
-          .then(async (data) => {
-            if (data.error || !data.user)
-              return this.props.navigation.push('login'); 
-            
-              if (data.user.notificationToken == null) {
-                this.getNotificationPermission(data.user);
-              } else {
-                this.props.navigation.push('main', {"user": data.user});
-              }
-          })
-          .catch(err => {
-            this.props.navigation.push('login');
-          });
+        });
       } else {
-        this.props.navigation.push('login');
+        this.props.navigation.navigate('Landing');
       }
     } catch (error) {
-      this.props.navigation.push('login');
+      this.props.navigation.navigate('Landing');
     }
   }
 
   render() {
     return (
-      <View style={styles.mainWrapper}>
-        <ActivityIndicator size="large" color="rgb(255, 67, 148)" />
+      <View style={styles.main_wrapper}>
+        <ActivityIndicator size="large" color="rgb(88, 0, 232)" />
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  mainWrapper: {
-    flex: 1,
-    backgroundColor: "rgb(248, 248, 248)",
-    justifyContent: "center",
-    alignItems: "center"
+  main_wrapper: {
+    flex: 1, backgroundColor: "rgb(253, 252, 252)",
+    justifyContent: "center", alignItems: "center"
   }
 });
 

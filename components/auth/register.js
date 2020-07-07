@@ -1,443 +1,246 @@
-import React, {Component} from 'react';
-import { AppRegistry, Keyboard, TouchableWithoutFeedback, Text, View, StyleSheet, TextInput, Image, ScrollView, TouchableOpacity} from 'react-native';
-import Constants from 'expo-constants';
-import { API_KEY } from 'react-native-dotenv'
+import React, { Component } from 'react';
+import { AppRegistry } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Platform, Keyboard, ScrollView, TouchableOpacity, StatusBar, Image } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faGraduationCap, faKey, faUser, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+
+const apiRequest = require('../../utils/apiRequest');
+
+const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 40 : StatusBar.currentHeight
 
 export default class Register extends Component {
   static navigationOptions = {
     header: null
   };
-
+  
   constructor (props) {
     super(props);
     this.state = {
-      onUniversity: false,
-      name: '',
-      email: '',
-      password: '',
-      university: '',
-      passwordConfirm: '',
-      error: '',
-      universityList: [
-        "Albert-Ludwigs-Universität Freiburg",
-        "Bard College Berlin, A Liberal Arts University",
-        "Bauhaus-Universität Weimar",
-        "Bergische Universität Wuppertal",
-        "Brandenburgische Technische Universität Cottbus-Senftenberg",
-        "Bucerius Law School",
-        "Carl von Ossietzky Universität Oldenburg",
-        "Charité - Universitätsmedizin Berlin",
-        "Christian-Albrechts-Universität zu Kiel",
-        "CODE University of Applied Sciences",
-        "Deutsche Sporthochschule Köln",
-        "Deutsche Universität für Verwaltungswissenschaften Speyer",
-        "Dresden International University",
-        "Eberhard Karls Universität Tübingen",
-        "EBS Universität für Wirtschaft und Recht",
-        "ESCP Europe Wirtschaftsschule",
-        "Europa-Universität Flensburg",
-        "Europa-Universität Viadrina Frankfurt (Oder)",
-        "European School of Management and Technology",
-        "FernUniversität in Hagen",
-        "Filmuniversität Babelsberg Konrad Wolf",
-        "Folkwang Universität der Künste",
-        "Frankfurt School of Finance & Management",
-        "Freie Hochschule Stuttgart – Seminar für Waldorfpädagogik",
-        "Freie Universität Berlin",
-        "Friedrich-Alexander-Universität Erlangen-Nürnberg",
-        "Friedrich-Schiller-Universität Jena",
-        "Georg-August-Universität Göttingen",
-        "HafenCity Universität Hamburg",
-        "HDBW München",
-        "Heinrich-Heine-Universität Düsseldorf",
-        "Helmut-Schmidt-Universität – Universität der Bundeswehr Hamburg",
-        "Hertie School of Governance",
-        "Hochschule für Philosophie München",
-        "Hochschule für Politik München – Bavarian School of Public Policy",
-        "Hochschule Landshut",
-        "Humboldt-Universität zu Berlin",
-        "International Psychoanalytic University Berlin",
-        "Jacobs University Bremen",
-        "Johann Wolfgang Goethe-Universität Frankfurt am Mai",
-        "Johannes-Gutenberg-Universität Mainz",
-        "Julius-Maximilians-Universität Würzburg",
-        "Justus-Liebig-Universität Gießen",
-        "Karlsruher Institut für Technologie",
-        "Katholische Universität Eichstätt-Ingolstadt",
-        "Kühne Logistics University - Wissenschaftliche Hochschule für Logistik und Unternehmensführung",
-        "Leibniz Universität Hannover",
-        "Leipzig Graduate School of Management",
-        "Leuphana Universität Lüneburg",
-        "Ludwig-Maximilians-Universität München (LMU)",
-        "Martin-Luther-Universität Halle-Wittenberg",
-        "Medizinische Hochschule Brandenburg Theodor Fontane",
-        "Medizinische Hochschule Hannover",
-        "MSH Medical School Hamburg",
-        "Otto von Guericke-Universität Magdeburg",
-        "Otto-Friedrich-Universität Bamberg",
-        "Pädagogische Hochschule Freiburg",
-        "Pädagogische Hochschule Heidelberg",
-        "Pädagogische Hochschule Karlsruhe",
-        "Pädagogische Hochschule Ludwigsburg",
-        "Pädagogische Hochschule Schwäbisch Gmünd",
-        "Pädagogische Hochschule Weingarten",
-        "Philipps-Universität Marburg",
-        "Psychologische Hochschule Berlin",
-        "Rheinisch-Westfälische Technische Hochschule Aachen",
-        "Rheinische Friedrich-Wilhelms-Universität Bonn",
-        "Ruhr-Universität Bochum",
-        "Ruprecht-Karls-Universität Heidelberg",
-        "Steinbeis-Hochschule Berlin",
-        "Stiftung Tierärztliche Hochschule Hannover",
-        "Stiftung Universität Hildesheim",
-        "Technische Universität Bergakademie Freiberg",
-        "Technische Universität Berlin",
-        "Technische Universität Carolo-Wilhelmina zu Braunschweig",
-        "Technische Universität Chemnitz",
-        "Technische Universität Clausthal",
-        "Technische Universität Darmstadt",
-        "Technische Universität Dortmund",
-        "Technische Universität Dresden",
-        "Technische Universität Hamburg",
-        "Technische Universität Ilmenau",
-        "Technische Universität Kaiserslautern",
-        "Technische Universität München (TUM)",
-        "Universität Augsburg",
-        "Universität Bayreuth",
-        "Universität Bremen",
-        "Universität der Bundeswehr München",
-        "Universität der Künste Berlin",
-        "Universität des Saarlandes",
-        "Universität Duisburg-Essen",
-        "Universität Erfurt",
-        "Universität Greifswald",
-        "Universität Hamburg",
-        "Universität Hohenheim",
-        "Universität Kassel",
-        "Universität Koblenz-Landau",
-        "Universität Konstanz",
-        "Universität Leipzig",
-        "Universität Mannheim",
-        "Universität Osnabrück",
-        "Universität Paderborn",
-        "Universität Passau",
-        "Universität Potsdam",
-        "Universität Regensburg",
-        "Universität Rostock",
-        "Universität Siegen",
-        "Universität Stuttgart",
-        "Universität Trier",
-        "Universität Ulm",
-        "Universität Vechta",
-        "Universität Witten/Herdecke",
-        "Universität zu Köln",
-        "Universität zu Lübeck",
-        "Westfälische Wilhelms-Universität Münster",
-        "WHU - Otto Beisheim School of Management",
-        "Zeppelin Universität"
-      ],
-      originalUniversityList: [
-        "Albert-Ludwigs-Universität Freiburg",
-        "Bard College Berlin, A Liberal Arts University",
-        "Bauhaus-Universität Weimar",
-        "Bergische Universität Wuppertal",
-        "Brandenburgische Technische Universität Cottbus-Senftenberg",
-        "Bucerius Law School",
-        "Carl von Ossietzky Universität Oldenburg",
-        "Charité - Universitätsmedizin Berlin",
-        "Christian-Albrechts-Universität zu Kiel",
-        "CODE University of Applied Sciences",
-        "Deutsche Sporthochschule Köln",
-        "Deutsche Universität für Verwaltungswissenschaften Speyer",
-        "Dresden International University",
-        "Eberhard Karls Universität Tübingen",
-        "EBS Universität für Wirtschaft und Recht",
-        "ESCP Europe Wirtschaftsschule",
-        "Europa-Universität Flensburg",
-        "Europa-Universität Viadrina Frankfurt (Oder)",
-        "European School of Management and Technology",
-        "FernUniversität in Hagen",
-        "Filmuniversität Babelsberg Konrad Wolf",
-        "Folkwang Universität der Künste",
-        "Frankfurt School of Finance & Management",
-        "Freie Hochschule Stuttgart – Seminar für Waldorfpädagogik",
-        "Freie Universität Berlin",
-        "Friedrich-Alexander-Universität Erlangen-Nürnberg",
-        "Friedrich-Schiller-Universität Jena",
-        "Georg-August-Universität Göttingen",
-        "HafenCity Universität Hamburg",
-        "HDBW München",
-        "Heinrich-Heine-Universität Düsseldorf",
-        "Helmut-Schmidt-Universität – Universität der Bundeswehr Hamburg",
-        "Hertie School of Governance",
-        "Hochschule für Philosophie München",
-        "Hochschule für Politik München – Bavarian School of Public Policy",
-        "Hochschule Landshut",
-        "Humboldt-Universität zu Berlin",
-        "International Psychoanalytic University Berlin",
-        "Jacobs University Bremen",
-        "Johann Wolfgang Goethe-Universität Frankfurt am Mai",
-        "Johannes-Gutenberg-Universität Mainz",
-        "Julius-Maximilians-Universität Würzburg",
-        "Justus-Liebig-Universität Gießen",
-        "Karlsruher Institut für Technologie",
-        "Katholische Universität Eichstätt-Ingolstadt",
-        "Kühne Logistics University - Wissenschaftliche Hochschule für Logistik und Unternehmensführung",
-        "Leibniz Universität Hannover",
-        "Leipzig Graduate School of Management",
-        "Leuphana Universität Lüneburg",
-        "Ludwig-Maximilians-Universität München (LMU)",
-        "Martin-Luther-Universität Halle-Wittenberg",
-        "Medizinische Hochschule Brandenburg Theodor Fontane",
-        "Medizinische Hochschule Hannover",
-        "MSH Medical School Hamburg",
-        "Otto von Guericke-Universität Magdeburg",
-        "Otto-Friedrich-Universität Bamberg",
-        "Pädagogische Hochschule Freiburg",
-        "Pädagogische Hochschule Heidelberg",
-        "Pädagogische Hochschule Karlsruhe",
-        "Pädagogische Hochschule Ludwigsburg",
-        "Pädagogische Hochschule Schwäbisch Gmünd",
-        "Pädagogische Hochschule Weingarten",
-        "Philipps-Universität Marburg",
-        "Psychologische Hochschule Berlin",
-        "Rheinisch-Westfälische Technische Hochschule Aachen",
-        "Rheinische Friedrich-Wilhelms-Universität Bonn",
-        "Ruhr-Universität Bochum",
-        "Ruprecht-Karls-Universität Heidelberg",
-        "Steinbeis-Hochschule Berlin",
-        "Stiftung Tierärztliche Hochschule Hannover",
-        "Stiftung Universität Hildesheim",
-        "Technische Universität Bergakademie Freiberg",
-        "Technische Universität Berlin",
-        "Technische Universität Carolo-Wilhelmina zu Braunschweig",
-        "Technische Universität Chemnitz",
-        "Technische Universität Clausthal",
-        "Technische Universität Darmstadt",
-        "Technische Universität Dortmund",
-        "Technische Universität Dresden",
-        "Technische Universität Hamburg",
-        "Technische Universität Ilmenau",
-        "Technische Universität Kaiserslautern",
-        "Technische Universität München (TUM)",
-        "Universität Augsburg",
-        "Universität Bayreuth",
-        "Universität Bremen",
-        "Universität der Bundeswehr München",
-        "Universität der Künste Berlin",
-        "Universität des Saarlandes",
-        "Universität Duisburg-Essen",
-        "Universität Erfurt",
-        "Universität Greifswald",
-        "Universität Hamburg",
-        "Universität Hohenheim",
-        "Universität Kassel",
-        "Universität Koblenz-Landau",
-        "Universität Konstanz",
-        "Universität Leipzig",
-        "Universität Mannheim",
-        "Universität Osnabrück",
-        "Universität Paderborn",
-        "Universität Passau",
-        "Universität Potsdam",
-        "Universität Regensburg",
-        "Universität Rostock",
-        "Universität Siegen",
-        "Universität Stuttgart",
-        "Universität Trier",
-        "Universität Ulm",
-        "Universität Vechta",
-        "Universität Witten/Herdecke",
-        "Universität zu Köln",
-        "Universität zu Lübeck",
-        "Westfälische Wilhelms-Universität Münster",
-        "WHU - Otto Beisheim School of Management",
-        "Zeppelin Universität"
-      ]
+      name: "",
+      email: "",
+      school: "",
+      school_name: "",
+      password: "",
+      error: "",
+      school_open: false,
+      original_schools: [],
+      schools: []
     };
+  };
+
+  engName = word => {
+    return word.toLocaleLowerCase().split('ş').join('s').split('ı').join('i').split('ö').join('o').split('ç').join('c').split('ü').join('u').split('ğ').join('g');
   }
 
-  nextButtonController = () => {
-    Keyboard.dismiss()
-    
-  }
-
-  registerButtonController = () => {
-    Keyboard.dismiss();
-    if (this.state.name && this.state.email && this.state.password && this.state.passwordConfirm && this.state.university) {
-      if (this.state.password.length >= 6) {
-        if (this.state.password == this.state.passwordConfirm) {
-          fetch(`https://stumarkt.herokuapp.com/api/register?email=${this.state.email}&name=${this.state.name}&password=${this.state.password}&university=${this.state.university}` , {
-            headers: {
-              "x_auth": API_KEY
-            }
-          })
-          .then(response => {return response.json()})
-          .then(data => {
-            if (data.error && data.error == 'Email is not valid') {
-              this.setState({
-                "onUniversity": false,
-                "error": "Lütfen geçerli bir e-posta adresi girin."
-              })
-            } else if (data.error && data.error == 'Email is taken') {
-              this.setState({
-                "onUniversity": false,
-                "error": "Bu e-posta adresi zaten kullanılmış."
-              })
-            } else if (data.error) {
-              alert("Err: " + data.error);
-            } else {
-              this.props.navigation.push('main', {"user": data.user});
-            }
-          })
-          .catch(err => {
-            alert("Err: " + err);u
-          });
-        } else {
-          this.setState({
-            "error": "Lütfen şifrenizi onaylayın."
-          });
-        }
-      } else {
-        this.setState({
-          "error": "Şifreniz en az 6 karakter uzunluğunda olmalıdır."
-        });
-      }
-    } else {
-      this.setState({
-        "error": "Lütfen tüm bilgileri girin."
-      });
+  addUserToAsyncStorage = async (email, password, callback) => {
+    try {
+      await AsyncStorage.setItem('email', email);
+      await AsyncStorage.setItem('password', password);
+      callback();
+    } catch (error) {
+      alert("Hesabınız kaydedilemedi, lütfen daha sonra tekrar deneyin.");
     }
+  };
+
+  registerPostController = () => {
+    Keyboard.dismiss();
+
+    if (!this.state.email || !this.state.password || !this.state.name || !this.state.original_schools.filter(school => school._id == this.state.school).length)
+      return this.setState({ error: "Lütfen tüm bilgileri girin." });
+
+    if (this.state.password.length < 6)
+      return this.setState({ error: "Şifreniz 6 haneden uzun olmalıdır." });
+
+    apiRequest({
+      method: "POST",
+      url: "/auth/register",
+      body: {
+        email: this.state.email,
+        name: this.state.name,
+        school: this.state.school,
+        password: this.state.password
+      }
+    }, (err, data) => {
+      if (err) return this.setState({ error: "Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin." });
+
+      if (data.error && data.error == 'bad request')
+        return this.setState({ error: "Lütfen tüm bilgileri girin." });
+
+      if (data.error && data.error == 'email is not valid')
+        return this.setState({ error: "Lütfen geçerli bir e-posta adresi girin." });
+
+      if (data.error && data.error == 'email is taken')
+        return this.setState({ error: "Bu e-posta adresi zaten kullanımda." });
+
+      this.addUserToAsyncStorage(this.state.email, this.state.password, () => {
+        this.props.navigation.navigate('Index', { id: data.user._id });
+      });
+    });
   }
+
+  getSchools = () => {
+    apiRequest({
+      method: 'GET',
+      url: '/schools'
+    }, (err, data) => {
+      if (err || data.error) return this.props.navigation.navigate('Landing');
+
+      this.setState({
+        original_schools: data.schools,
+        schools: data.schools
+      });
+    });
+  }
+
+  componentDidMount() {
+    this.getSchools();
+  }
+
 
   render() {
     return (
-      <TouchableWithoutFeedback style={styles.mainWrapper} onPress={() => {Keyboard.dismiss()}}>
-        <View style={styles.innerWrapper} >
-          <View style={styles.formWrapper}>
-            <View style={styles.header} >
-              <Text style={styles.title} >Üye ol</Text>
-            </View>
-            <TextInput 
-              style={styles.formInput}
-              placeholder="Ad Soyad"
-              onChangeText={(name) => { this.setState({name: name})}}
-            >
-            </TextInput>
-            <TextInput 
-              style={styles.formInput}
-              placeholder="E-posta"
-              onChangeText={(email) => {this.setState({email: email})}}
-            >
-            </TextInput>
-            <TextInput 
-              style={styles.formInput}
-              placeholder="Okul"
-              onChangeText={(university) => {this.setState({university: university})}}
-            >
-            </TextInput>
-            <TextInput
-              secureTextEntry={true}
-              style={styles.formInput}
-              placeholder="Şifre (en az 6 haneli)"
-              onChangeText={(password) => {this.setState({password: password})}}
-            >
-            </TextInput>
-            <TextInput
-              secureTextEntry={true}
-              style={styles.formInput}
-              placeholder="Şifre tekrarı"
-              onChangeText={(password) => {this.setState({passwordConfirm: password})}}
-            >
-            </TextInput>
-            <TouchableOpacity style={styles.sendButton} onPress={() => {this.registerButtonController()}} >
-              <Text style={styles.sendButtonText} >Üye Ol</Text>
-            </ TouchableOpacity>
-            <View style={styles.errorLineWrapper} >
-              <Text style={styles.errorLine} >{this.state.error}</Text>
-            </View>
-          </View>
-          <View style={styles.bottomLink} >
-            <Text style={styles.bottomLinkInfo} >Zaten üye misin?</Text>
-            <TouchableOpacity
-              onPress={() => {this.props.navigation.navigate('login')}} 
-            >
-              <Text style={styles.bottomLinkButton} >Giriş Yap</Text>
-            </TouchableOpacity>
-          </View>
+      <View style={styles.main_wrapper} >
+        <Text style={styles.title} >Kaydol</Text>
+        <View style={styles.each_input_wrapper} >
+          <FontAwesomeIcon icon={faEnvelope} size={17} color="rgb(0, 0, 0)" />
+          <TextInput
+            placeholder="E-Posta"
+            style={styles.each_input}
+            onChangeText={text => {this.setState({ email: text })}}
+          >{this.state.email}</TextInput>
         </View>
-      </TouchableWithoutFeedback>
+        <View style={{zIndex: 5, height: 50, marginTop: 20, overflow: "visible", width: "90%", alignSelf: "center"}} >
+          <TouchableOpacity onPress={() => {this.setState({ school_open: !this.state.school_open })}} style={[styles.each_input_select_wrapper, {zIndex: 5, borderBottomLeftRadius: this.state.school_open ? 0 : 30, borderBottomRightRadius: this.state.school_open ? 0 : 30, borderBottomWidth: this.state.school_open ? 0 : 2}]} >
+            <FontAwesomeIcon icon={faGraduationCap} size={21} color="rgb(0, 0, 0)" />
+            <TextInput
+              placeholder="Lise/Üniversite"
+              style={styles.each_input}
+              onChangeText={text => {
+                  if (text.length)
+                    this.setState(state => {
+                      const schools = state.original_schools.filter(school => this.engName(school.name).includes(this.engName(text)));
+                      schools.sort((a, b) => {
+                        return this.engName(a.name).includes(this.engName(text)) < this.engName(b.name).includes(this.engName(text))
+                      });
+
+                      return { schools };
+                    });
+                  else
+                    this.setState({
+                      schools: this.state.original_schools
+                    });
+              }}
+              onFocus={() => this.setState({ school_open: !this.state.school_open })}
+            >{this.state.school_name}</TextInput>
+          </TouchableOpacity>
+          <ScrollView style={[styles.input_select_wrapper, {display: this.state.school_open ? "flex" : "none"}]} >
+            {this.state.schools.filter((school, key) => key < 100).map((school, key) => {
+              return (
+                <TouchableOpacity key={key} style={styles.filter_each_chose} onPress={() => {
+                  this.setState({
+                    school: school._id,
+                    school_name: school.name,
+                    school_open: false
+                  })
+                }} >
+                  <Text style={styles.filter_each_chose_text} >{school.name}</Text>
+                </TouchableOpacity>
+              )
+            })}
+          </ScrollView>
+        </View>
+        <View style={styles.each_input_wrapper} >
+          <FontAwesomeIcon icon={faUser} size={20} color="rgb(0, 0, 0)" />
+          <TextInput
+            placeholder="Ad Soyad"
+            style={styles.each_input}
+            onChangeText={text => {this.setState({ name: text })}}
+          >{this.state.name}</TextInput>
+        </View>
+        <View style={styles.each_input_wrapper} >
+          <FontAwesomeIcon icon={faKey} size={17} color="rgb(0, 0, 0)" />
+          <TextInput
+            placeholder="Şifre"
+            secureTextEntry={true}
+            style={styles.each_input}
+            onChangeText={text => {this.setState({ password: text })}}
+          >{this.state.password}</TextInput>
+        </View>
+        <Text style={styles.error_text} >{this.state.error}</Text>
+        <TouchableOpacity style={styles.register} onPress={() => {this.registerPostController()}} >
+          <Text style={styles.register_text} >Kaydol</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.login}
+          onPress={() => {this.props.navigation.navigate('Login')}}
+        >
+          <Text style={styles.login_text} >Zaten üye misin? Giriş Yap</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  mainWrapper: {
-    flex: 1, justifyContent: "center",
-    backgroundColor: "rgb(248, 248, 248)",
-    paddingTop: Constants.statusBarHeight,
-    padding: 25
-  },
-  innerWrapper: {
-    flex: 1,
-    margin: 25, marginTop: 150
-  },
-  formWrapper: {
-    backgroundColor: "white",
-    paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10,
-    borderColor: "rgb(236, 236, 235)", borderWidth: 2, borderRadius: 5
-  },
-  header: {
-    flexDirection: "row", alignItems: "center",
-    marginBottom: 20
+  main_wrapper: {
+    flex: 1, paddingTop: STATUSBAR_HEIGHT,
+    backgroundColor: "rgb(253, 252, 252)"
   },
   title: {
-    fontSize: 25, color: "rgb(112, 112, 112)", fontWeight: "200",
-    flex: 3
+    marginTop: 10, color: "rgb(15, 15, 15)", fontWeight: "700",
+    width: "90%", alignSelf: "center", fontSize: 30
   },
-  formInput: {
-    backgroundColor: "rgb(248, 248, 248)",
-    padding: 10,
-    borderColor: "rgb(236, 236, 235)", borderWidth: 2, borderRadius: 5,
-    color: "rgb(112, 112, 122)", fontSize: 16,
-    marginBottom: 15
+  each_input_wrapper: {
+    flexDirection: "row", alignItems: "center",
+    marginTop: 20, width: "90%", alignSelf: "center",
+    borderColor: "rgb(236, 236, 236)", borderWidth: 2,
+    backgroundColor: "rgb(248, 248, 248)", paddingLeft: 15, paddingRight: 15, height: 50, borderRadius: 30
   },
-  agreementWrapper: {
-    marginBottom: 20
+  each_input: {
+    color: "rgb(15, 15, 15)", fontSize: 17, fontWeight: "500",
+    marginLeft: 10, flex: 1
   },
-  agreementText: {
-    fontSize: 17, color: "rgb(112, 112, 112)", fontWeight: "300"
+  each_input_select_wrapper: {
+    flexDirection: "row", alignItems: "center",
+    borderColor: "rgb(236, 236, 236)", borderWidth: 2,
+    backgroundColor: "rgb(248, 248, 248)", paddingLeft: 15, paddingRight: 15, height: 50, borderRadius: 30
   },
-  agreementLink: {
-    fontSize: 17, color: "rgb(255, 61, 148)", fontWeight: "300", textDecorationLine: "underline",
-    marginTop: 5, marginLeft: 20
+  each_input: {
+    color: "rgb(15, 15, 15)", fontSize: 17, fontWeight: "500",
+    marginLeft: 10, flex: 1
   },
-  sendButton: {
-    backgroundColor: "rgba(255, 108, 128, 0.3)",
+  input_select_wrapper: {
+    height: 150, minHeight: 150, backgroundColor: "rgb(248, 248, 248)",
+    width: "100%", borderColor: "rgb(236, 236, 236)", borderWidth: 2, borderTopWidth: 0,
+    borderBottomLeftRadius: 20, borderBottomRightRadius: 20
+  },
+  filter_each_chose: {
+    borderTopWidth: 1, borderTopColor: "rgb(210, 210, 210)", width: "100%",
+    justifyContent: "center", alignItems: "center", paddingTop: 10, paddingBottom: 10
+  },
+  filter_each_chose_text: {
+    fontSize: 15, fontWeight: "300", color: "rgb(112, 112, 112)", textAlign: "center"
+  },
+  error_text: {
+    marginTop: "auto", width: "90%", textAlign: "center",
+    fontSize: 16, color: "red", fontWeight: "500", alignSelf: "center"
+  },
+  register: {
     justifyContent: "center", alignItems: "center",
-    borderColor: "rgba(255, 61, 148, 0.4)", borderWidth: 2, borderRadius: 5,
-    padding: 10
+    backgroundColor: "rgb(88, 0, 232)", borderRadius: 20,
+    padding: 15, shadowColor: "rgb(0, 0, 0)", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5,
+    width: "90%", marginBottom: 15, marginTop: 15,
+    alignSelf: "center"
   },
-  sendButtonText: {
-    color: "rgb(255, 61, 148)", fontWeight: "700", fontSize: 16
+  register_text: {
+    color: "rgb(255, 255, 255)", fontSize: 22, fontWeight: "600"
   },
-  errorLineWrapper: {
-    flexDirection: "row",
-    marginTop: 10
+  login: {
+    marginBottom: 60, alignSelf: "center"
   },
-  errorLine: {
-    flex: 1,
-    fontSize: 13, color: "rgb(255, 61, 148)", textAlign: "center"
-  },
-  bottomLink: {
-    paddingLeft: 20, marginTop: 10
-  },
-  bottomLinkInfo: {
-    color: "rgb(112, 112, 112)", fontSize: 18,
-    marginBottom: 5
-  },
-  bottomLinkButton: {
-    color: "rgb(255, 61, 148)", fontSize: 18, fontWeight: "700"
+  login_text: {
+    color: "rgb(0, 0, 0)", fontSize: 17, fontWeight: "500",
   }
 });
 
